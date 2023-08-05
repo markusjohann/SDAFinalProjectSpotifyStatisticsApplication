@@ -35,7 +35,7 @@ public class SpotifyApiServiceExample {
 
         final TopItemsResponseDto topArtists = spotifyApiService.getTopArtists();
 
-        final TopItemsResponseDto topTracks = spotifyApiService.getTopArtists();
+        final TopItemsResponseDto topTracks = spotifyApiService.getTopTracks();
 
         return "<pre>" +
                 "USER DETAILS:\n" +
