@@ -1,4 +1,4 @@
-package dev.coffeebeanteam.spotifyshare.model;
+package dev.coffeebeanteam.spotifyshare.Entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

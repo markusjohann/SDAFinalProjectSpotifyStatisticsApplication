@@ -1,6 +1,6 @@
 package dev.coffeebeanteam.spotifyshare.repository;
 
-import dev.coffeebeanteam.spotifyshare.model.UserAccount;
+import dev.coffeebeanteam.spotifyshare.Entity.UserAccount;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
