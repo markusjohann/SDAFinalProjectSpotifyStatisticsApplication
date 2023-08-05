@@ -8,19 +8,4 @@ spring:
     database-platform: org.hibernate.dialect.MariaDBDialect
     show-sql: true
     hibernate:
-      ddl-auto: create
- # security:
- #   oauth2:
- #     client:
- #       registration:
- #         spotify:
- #           clientId: "c67a5480a1644ca18acf795817d69fd2"
- #           clientSecret: "f2091246f80549c99f747477a080a55e"
- #           scope: user-read-email,user-read-private
- #           redirectUri: "http://localhost:8080/spotify-auth"
- #       provider:
- #         spotify:
- #           authorizationUri: https://accounts.spotify.com/authorize
- #           tokenUri: https://accounts.spotify.com/api/token
- #           userInfoUri: https://api.spotify.com/v1/me
- #           userNameAttribute: id
+      ddl-auto: update

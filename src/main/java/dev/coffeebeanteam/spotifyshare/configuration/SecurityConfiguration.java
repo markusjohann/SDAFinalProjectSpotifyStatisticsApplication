@@ -1,8 +1,10 @@
 package dev.coffeebeanteam.spotifyshare.configuration;
 
+import dev.coffeebeanteam.spotifyshare.service.JpaOAuth2AuthorizedClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -15,10 +17,16 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 class SecurityConfiguration {
-    private SpotifyApiConfiguration apiConf;
+    final private SpotifyApiConfiguration spotifyApiConfiguration;
 
-    SecurityConfiguration(SpotifyApiConfiguration apiConf) {
-        this.apiConf = apiConf;
+    final private JpaOAuth2AuthorizedClientService authorizedClientService;
+
+    SecurityConfiguration(
+            SpotifyApiConfiguration spotifyApiConfiguration,
+            @Lazy JpaOAuth2AuthorizedClientService authorizedClientService
+            ) {
+        this.spotifyApiConfiguration = spotifyApiConfiguration;
+        this.authorizedClientService = authorizedClientService;
     }
 
     @Bean
@@ -27,9 +35,13 @@ class SecurityConfiguration {
 
         httpSecurity.csrf(csrf -> csrf.disable());
 
-        httpSecurity.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
+        httpSecurity.authorizeHttpRequests(
+                auth -> auth.anyRequest().authenticated()
+        );
 
-        httpSecurity.oauth2Login(oa2login -> oa2login.defaultSuccessUrl("/welcome", true));
+        httpSecurity.oauth2Login(oa2login -> oa2login
+                .authorizedClientService(authorizedClientService)
+                .defaultSuccessUrl("/", true));
 
         return httpSecurity.build();
     }
@@ -37,17 +49,17 @@ class SecurityConfiguration {
     @Bean
     public ClientRegistrationRepository clientRegistrationRepository() {
         ClientRegistration.Builder builder = ClientRegistration.withRegistrationId("spotify")
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .redirectUri("{baseUrl}/{action}/oauth2/code/{registrationId}")
-                .scope("user-read-private,user-read-email")
+                .scope("user-read-private,user-read-email,user-top-read")
                 .authorizationUri("https://accounts.spotify.com/authorize")
                 .tokenUri("https://accounts.spotify.com/api/token")
                 .userInfoUri("https://api.spotify.com/v1/me")
                 .userNameAttributeName("id")
                 .clientName("spotify")
-                .clientId(apiConf.getApiClientId())
-                .clientSecret(apiConf.getApiClientSecret());
+                .clientId(spotifyApiConfiguration.getApiClientId())
+                .clientSecret(spotifyApiConfiguration.getApiClientSecret());
 
         return new InMemoryClientRegistrationRepository(
                 builder.build());

@@ -1,13 +1,65 @@
 package dev.coffeebeanteam.spotifyshare.service;
 
-import dev.coffeebeanteam.spotifyshare.configuration.SpotifyApiConfiguration;
+import dev.coffeebeanteam.spotifyshare.dto.SpotifyUserDto;
+import dev.coffeebeanteam.spotifyshare.dto.TopItemsResponseDto;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
+@Setter
+@Getter
+@Accessors(chain = true)
 public class SpotifyApiService {
-    private SpotifyApiConfiguration apiConf;
+    private OAuth2AuthorizedClient authorizedClient;
+    private String token;
+    private final WebClient webClient;
 
-    public SpotifyApiService(SpotifyApiConfiguration apiConf) {
-        this.apiConf = apiConf;
+    @Autowired
+    public SpotifyApiService(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder
+                .baseUrl("https://api.spotify.com")
+                .build();
+    }
+
+    public String getToken() {
+        if (token == null && authorizedClient != null) {
+            setToken(authorizedClient.getAccessToken().getTokenValue());
+        }
+
+        return token;
+    }
+
+    public SpotifyUserDto getUser() {
+        return webClient
+                .get()
+                .uri("/v1/me")
+                .headers(headers -> headers.setBearerAuth(getToken()))
+                .retrieve()
+                .bodyToMono(SpotifyUserDto.class)
+                .block();
+    }
+
+    public TopItemsResponseDto getTopArtists() {
+        return getTopItems("artists");
+    }
+
+    public TopItemsResponseDto getTopTracks() {
+        return getTopItems("tracks");
+    }
+
+    protected TopItemsResponseDto getTopItems(final String type) {
+        return webClient
+                .get()
+                .uri("/v1/me/top/" + type)
+                .headers(headers -> headers.setBearerAuth(getToken()))
+                .retrieve()
+                .bodyToMono(TopItemsResponseDto.class)
+                .block();
     }
 }
+
