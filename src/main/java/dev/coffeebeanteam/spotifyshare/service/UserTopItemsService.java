@@ -1,4 +1,4 @@
-package dev.coffeebeanteam.spotifyshare.Service;
+package dev.coffeebeanteam.spotifyshare.service;
 
 import dev.coffeebeanteam.spotifyshare.repository.UserTopItemsRepository;
 import org.springframework.beans.factory.annotation.Autowired;

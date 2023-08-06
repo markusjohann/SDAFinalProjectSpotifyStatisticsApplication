@@ -1,4 +1,4 @@
-package dev.coffeebeanteam.spotifyshare.Entity;
+package dev.coffeebeanteam.spotifyshare.model;
 
 
 import jakarta.persistence.*;

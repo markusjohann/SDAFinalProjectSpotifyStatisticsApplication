@@ -1,6 +1,6 @@
-package dev.coffeebeanteam.spotifyshare.Controller;
+package dev.coffeebeanteam.spotifyshare.controller;
 
-import dev.coffeebeanteam.spotifyshare.Entity.UserAccount;
+import dev.coffeebeanteam.spotifyshare.model.UserAccount;
 import dev.coffeebeanteam.spotifyshare.repository.UserAccountRepository;
 import dev.coffeebeanteam.spotifyshare.repository.UserTopItemsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
