@@ -12,5 +12,6 @@ public interface UserTopItemsRepository extends JpaRepository<UserTopItem, Long>
 
     public List<UserTopItem> findByUserAccount(UserAccount userAccount);
 
+    public List<UserTopItem> deleteAllByUserAccount(UserAccount userAccount);
 
 }

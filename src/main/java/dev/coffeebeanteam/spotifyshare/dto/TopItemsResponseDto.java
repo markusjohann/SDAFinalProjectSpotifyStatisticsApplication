@@ -13,5 +13,5 @@ public class TopItemsResponseDto {
     private String previous;
     private int total;
     @JsonProperty("items")
-    private List<TopItemDto> artists;
+    private List<TopItemDto> items;
 }
