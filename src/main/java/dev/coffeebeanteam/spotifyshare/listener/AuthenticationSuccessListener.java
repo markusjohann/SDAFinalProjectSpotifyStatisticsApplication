@@ -1,6 +1,6 @@
 package dev.coffeebeanteam.spotifyshare.listener;
 
-import dev.coffeebeanteam.spotifyshare.dto.SpotifyUserDto;
+import dev.coffeebeanteam.spotifyshare.dto.UserDto;
 import dev.coffeebeanteam.spotifyshare.dto.TopItemsResponseDto;
 import dev.coffeebeanteam.spotifyshare.model.UserAccount;
 import dev.coffeebeanteam.spotifyshare.repository.UserAccountRepository;
@@ -39,8 +39,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             final String token = authentication.getAccessToken().getTokenValue();
 
             spotifyApiService.setToken(token);
-            final SpotifyUserDto spotifyUser = spotifyApiService.getUser();
-
+            final UserDto spotifyUser = spotifyApiService.getUser();
             final TopItemsResponseDto topArtists = spotifyApiService.getTopArtists();
             final TopItemsResponseDto topTracks = spotifyApiService.getTopTracks();
 
@@ -52,7 +51,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
                                     .setSpotifyUsername(displayName)
                     );
 
-                    // userTopItemsService.clearUserTopItems(userAccount);
+                    userTopItemsService.clearUserTopItems(userAccount);
                     userTopItemsService.syncUserTopItemsFromDto(topArtists, userAccount);
                     userTopItemsService.syncUserTopItemsFromDto(topTracks, userAccount);
                 },

@@ -5,11 +5,12 @@ import dev.coffeebeanteam.spotifyshare.dto.TopItemsResponseDto;
 import dev.coffeebeanteam.spotifyshare.model.UserAccount;
 import dev.coffeebeanteam.spotifyshare.model.UserTopItem;
 import dev.coffeebeanteam.spotifyshare.repository.UserTopItemsRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-//this class is for saving data into database
-
+import java.util.ArrayList;
+import java.util.Arrays;
 
 @Service
 public class UserTopItemsService {
@@ -21,20 +22,27 @@ public class UserTopItemsService {
         this.userTopItemsRepository = userTopTrackRepository;
     }
 
+    @Transactional
     public void clearUserTopItems(UserAccount userAccount) {
-        userTopItemsRepository.deleteAllByUserAccount(userAccount);
+        userTopItemsRepository.deleteByUserAccount(userAccount);
     }
 
+    @Transactional
     public void syncUserTopItemsFromDto(TopItemsResponseDto topItems, UserAccount userAccount) {
         for (TopItemDto topItemDto: topItems.getItems()) {
-            final UserTopItem userTopItem = new UserTopItem();
-
-            userTopItem.setAlbum("");
-            userTopItem.setName(topItemDto.getName());
-            userTopItem.setType(topItemDto.getType());
-            userTopItem.setUserAccount(userAccount);
-
-            userTopItemsRepository.save(userTopItem);
+            userTopItemsRepository.save(
+                new UserTopItem()
+                        .setName(topItemDto.getName())
+                        .setType(topItemDto.getType())
+                        .setImages(
+                                topItemDto.getImages() != null ?
+                                    topItemDto.getImages().stream().map(
+                                            (image) -> image.getUrl()
+                                    ).toList() :
+                                        new ArrayList<>()
+                        )
+                        .setUserAccount(userAccount)
+            );
         }
     }
 }

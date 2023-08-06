@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class SpotifyUserDto {
+public class UserDto {
     private String country;
 
     @JsonProperty("display_name")

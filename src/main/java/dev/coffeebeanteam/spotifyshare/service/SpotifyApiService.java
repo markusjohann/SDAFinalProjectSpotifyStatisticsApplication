@@ -1,6 +1,6 @@
 package dev.coffeebeanteam.spotifyshare.service;
 
-import dev.coffeebeanteam.spotifyshare.dto.SpotifyUserDto;
+import dev.coffeebeanteam.spotifyshare.dto.UserDto;
 import dev.coffeebeanteam.spotifyshare.dto.TopItemsResponseDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,13 +34,13 @@ public class SpotifyApiService {
         return token;
     }
 
-    public SpotifyUserDto getUser() {
+    public UserDto getUser() {
         return webClient
                 .get()
                 .uri("/v1/me")
                 .headers(headers -> headers.setBearerAuth(getToken()))
                 .retrieve()
-                .bodyToMono(SpotifyUserDto.class)
+                .bodyToMono(UserDto.class)
                 .block();
     }
 
@@ -55,7 +55,7 @@ public class SpotifyApiService {
     protected TopItemsResponseDto getTopItems(final String type) {
         return webClient
                 .get()
-                .uri("/v1/me/top/" + type)
+                .uri("/v1/me/top/" + type + "?time_range=long_term&limit=50&offset=0")
                 .headers(headers -> headers.setBearerAuth(getToken()))
                 .retrieve()
                 .bodyToMono(TopItemsResponseDto.class)

@@ -1,11 +1,11 @@
 package dev.coffeebeanteam.spotifyshare.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
-
+import java.util.List;
 
 @Entity
 @Table
@@ -14,47 +14,36 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Accessors(chain = true)
 public class UserTopItem {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
     @ManyToOne
-    @JoinColumn(name = "user_account")
     private UserAccount userAccount;
 
-    //The name of the track
+    @Column
     private String name;
+
+    @Column
     private String artists;
 
-    //the number of the track. If an album has several discs, the track number is the number on the specified disc
+    @Column
     private Integer track_number;
 
-    //total playtime or the total number of times the user has listened to the top songs
+    @Column
     private long totalPlaytime;
 
-    //The time range for which the top songs are calculated "short_term," "medium_term," "long_term" etc
-    private String timeRange;
-    private String album;
+    @ElementCollection
+    private List<String> images;
 
-    //images of the artist in various sizes, the widest first.
-    private String image;
-
+    @Column
     private String type;
 
-    //The offset of the items returned (as set in the query or by default)
-    private Integer offset;
-
-    //the total number of items available to return
-    private Integer total;
-
-    //ability to show when were the stats first created and updated if wanted
-    @Column(name = "created_at")
+    @Column
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column
     private LocalDateTime updatedAt;
-
-
 }
