@@ -24,7 +24,7 @@ public class SpotifyApiServiceExample {
         this.objectMapper = objectMapper;
     }
 
-    @RequestMapping("/")
+    @RequestMapping("/example")
     @ResponseBody
     public String spotifyApiRequestExample(
             @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient
