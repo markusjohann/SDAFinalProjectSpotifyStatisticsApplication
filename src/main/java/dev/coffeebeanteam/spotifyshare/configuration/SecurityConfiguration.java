@@ -41,7 +41,7 @@ class SecurityConfiguration {
 
         httpSecurity.oauth2Login(oa2login -> oa2login
                 .authorizedClientService(authorizedClientService)
-                .defaultSuccessUrl("/", true));
+                .defaultSuccessUrl("/dashboard", true));
 
         return httpSecurity.build();
     }

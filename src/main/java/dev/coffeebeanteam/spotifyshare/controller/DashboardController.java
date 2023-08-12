@@ -1,30 +1,38 @@
 package dev.coffeebeanteam.spotifyshare.controller;
 
-import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.CollapsibleNavItem;
-import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.Divider;
-import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.Heading;
-import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.NavItem;
 import dev.coffeebeanteam.spotifyshare.service.ui.NavBarService;
+import dev.coffeebeanteam.spotifyshare.service.ui.UserAccountDetailsService;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/dashboard")
 public class DashboardController {
     private NavBarService navBarService;
+    private UserAccountDetailsService userAccountDetailsService;
 
-    public DashboardController(NavBarService navBarService) {
+    public DashboardController(
+            NavBarService navBarService,
+            UserAccountDetailsService userAccountDetailsService
+    ) {
         this.navBarService = navBarService;
+        this.userAccountDetailsService = userAccountDetailsService;
     }
 
     @GetMapping
-    public String index(Model model) {
+    public String index(
+            @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
+            Model model
+    ) {
         model.addAttribute("pageTitle", "Dashboard");
 
-        model.addAttribute("navBarItems", navBarService.getNavBarItems());
+        navBarService.populateViewModelWithNavBarItems(model);
+
+        userAccountDetailsService.setAuthorizedClient(authorizedClient).populateViewModelWithUserDetails(model);
 
         return "dashboard";
     }

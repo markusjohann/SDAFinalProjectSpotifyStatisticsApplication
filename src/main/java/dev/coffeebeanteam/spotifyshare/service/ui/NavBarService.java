@@ -5,6 +5,7 @@ import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.Divider;
 import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.Heading;
 import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.NavItem;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -50,5 +51,11 @@ public class NavBarService
             );
             add(new Divider());
         }};
+    }
+
+    public NavBarService populateViewModelWithNavBarItems(Model model) {
+        model.addAttribute("navBarItems", getNavBarItems());
+
+        return this;
     }
 }
