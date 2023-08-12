@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="fragments/rootpage :: rootPageContainer(~{:: div#wrapper})">
+<body>
+    <div id="wrapper">
+        <th:block th:insert="fragments/sidebar :: sidebarContainer"></th:block>
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <th:block th:insert="fragments/topbar :: topBarContainer"></th:block>
+                <th:block th:insert="fragments/content :: contentContainer"></th:block>
+            </div>
+            <th:block th:insert="fragments/footer :: footerContainer"></th:block>
+        </div>
+    </div>
+</body>
+</html>
