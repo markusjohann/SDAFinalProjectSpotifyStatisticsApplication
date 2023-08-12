@@ -1,7 +1,7 @@
 <!--/*
     th:fragment="navItem (navItem : dev.coffeebeanteam.spotifyshare.dto.ui.navbar.NavItem)"
 */-->
-<li class="nav-item active" th:fragment="navItem (navItem)">
+<li class="nav-item" th:fragment="navItem (navItem)">
     <a class="nav-link" th:href="${navItem.getLink()}">
         <i th:class="${navItem.getIconCss()}"></i>
         <span th:text="${navItem.getTitle()}"></span>

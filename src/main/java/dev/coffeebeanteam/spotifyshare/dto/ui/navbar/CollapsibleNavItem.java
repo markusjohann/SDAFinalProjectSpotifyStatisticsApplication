@@ -17,7 +17,8 @@ public class CollapsibleNavItem {
 
     private List<NavItem> navItems = new ArrayList<>();
 
-    private String collapseElementId = UUID.randomUUID().toString();
+    // Massage the random ids to make them valid HTML element ids
+    private String collapseElementId = "id-" + UUID.randomUUID().toString().replace("-", "X");
 
     public CollapsibleNavItem addNavItem(String title, String link, String iconCss) {
         navItems.add(

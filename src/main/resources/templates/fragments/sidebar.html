@@ -6,11 +6,11 @@
 >
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="">
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-laugh-wink"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">Spotify Share <sup>+</sup></div>
+        <div class="sidebar-brand-text mx-3">Spotify<sub>Share</sub></div>
     </a>
 
 
@@ -22,16 +22,20 @@
 
         <th:block th:if="${item instanceof T(dev.coffeebeanteam.spotifyshare.dto.ui.navbar.Divider)}">
             <!-- Insert NavItem fragment -->
-            <th:block th:insert="fragments/sidebar/divider :: divider"></th:block>
+            <th:block th:insert="fragments/sidebar/divider :: divider (${item})"></th:block>
         </th:block>
 
         <th:block th:if="${item instanceof T(dev.coffeebeanteam.spotifyshare.dto.ui.navbar.CollapsibleNavItem)}">
             <!-- Insert NavItem fragment -->
             <th:block th:insert="fragments/sidebar/collapsible-nav-item :: collapsibleNavItem(${item})"></th:block>
         </th:block>
+
+        <th:block th:if="${item instanceof T(dev.coffeebeanteam.spotifyshare.dto.ui.navbar.Heading)}">
+            <!-- Insert NavItem fragment -->
+            <th:block th:insert="fragments/sidebar/heading :: heading (${item})"></th:block>
+        </th:block>
     </th:block>
 
-    <!-- Sidebar Toggler (Sidebar) -->
     <div class="text-center d-none d-md-inline">
         <button class="rounded-circle border-0" id="sidebarToggle"></button>
     </div>
