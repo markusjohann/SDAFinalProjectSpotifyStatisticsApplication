@@ -2,7 +2,7 @@ package dev.coffeebeanteam.spotifyshare.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.coffeebeanteam.spotifyshare.dto.SpotifyUserDto;
+import dev.coffeebeanteam.spotifyshare.dto.UserDto;
 import dev.coffeebeanteam.spotifyshare.dto.TopItemsResponseDto;
 import dev.coffeebeanteam.spotifyshare.service.SpotifyApiService;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -31,7 +31,7 @@ public class SpotifyApiServiceExample {
     ) throws JsonProcessingException {
         spotifyApiService.setAuthorizedClient(authorizedClient);
 
-        final SpotifyUserDto spotifyUser = spotifyApiService.getUser();
+        final UserDto spotifyUser = spotifyApiService.getUser();
 
         final TopItemsResponseDto topArtists = spotifyApiService.getTopArtists();
 
