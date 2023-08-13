@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserTopItemsService {
@@ -43,5 +44,9 @@ public class UserTopItemsService {
                         .setUserAccount(userAccount)
             );
         }
+    }
+
+    public List<UserTopItem> getTopItemsByUser(UserAccount userAccount) {
+        return this.userTopItemsRepository.findByUserAccount(userAccount);
     }
 }

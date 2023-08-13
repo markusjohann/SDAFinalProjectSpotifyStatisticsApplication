@@ -15,22 +15,22 @@
 
 
     <th:block th:each="item : ${navBarItems}">
-        <th:block th:if="${item instanceof T(dev.coffeebeanteam.spotifyshare.dto.ui.navbar.NavItem)}">
+        <th:block th:if="${item instanceof T(dev.coffeebeanteam.spotifyshare.dto.ui.navbar.NavItemDto)}">
             <!-- Insert NavItem fragment -->
             <th:block th:insert="fragments/sidebar/navitem :: navItem (${item})"></th:block>
         </th:block>
 
-        <th:block th:if="${item instanceof T(dev.coffeebeanteam.spotifyshare.dto.ui.navbar.Divider)}">
+        <th:block th:if="${item instanceof T(dev.coffeebeanteam.spotifyshare.dto.ui.navbar.DividerDto)}">
             <!-- Insert NavItem fragment -->
             <th:block th:insert="fragments/sidebar/divider :: divider (${item})"></th:block>
         </th:block>
 
-        <th:block th:if="${item instanceof T(dev.coffeebeanteam.spotifyshare.dto.ui.navbar.CollapsibleNavItem)}">
+        <th:block th:if="${item instanceof T(dev.coffeebeanteam.spotifyshare.dto.ui.navbar.CollapsibleNavItemDto)}">
             <!-- Insert NavItem fragment -->
             <th:block th:insert="fragments/sidebar/collapsible-nav-item :: collapsibleNavItem(${item})"></th:block>
         </th:block>
 
-        <th:block th:if="${item instanceof T(dev.coffeebeanteam.spotifyshare.dto.ui.navbar.Heading)}">
+        <th:block th:if="${item instanceof T(dev.coffeebeanteam.spotifyshare.dto.ui.navbar.HeadingDto)}">
             <!-- Insert NavItem fragment -->
             <th:block th:insert="fragments/sidebar/heading :: heading (${item})"></th:block>
         </th:block>

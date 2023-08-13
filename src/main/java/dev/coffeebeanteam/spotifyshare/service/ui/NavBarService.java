@@ -1,9 +1,9 @@
 package dev.coffeebeanteam.spotifyshare.service.ui;
 
-import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.CollapsibleNavItem;
-import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.Divider;
-import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.Heading;
-import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.NavItem;
+import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.CollapsibleNavItemDto;
+import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.DividerDto;
+import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.HeadingDto;
+import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.NavItemDto;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
@@ -16,14 +16,14 @@ public class NavBarService
     public List<Object> getNavBarItems()
     {
         return new ArrayList() {{
-            add(new Divider().setCss("my-0"));
-            add(new NavItem()
+            add(new DividerDto().setCss("my-0"));
+            add(new NavItemDto()
                     .setTitle("Dashboard")
                     .setIconCss("fas fa-fw fa-music")
             );
-            add(new Divider());
-            add(new Heading().setTitle("Sharing"));
-            add(new CollapsibleNavItem()
+            add(new DividerDto());
+            add(new HeadingDto().setTitle("Sharing"));
+            add(new CollapsibleNavItemDto()
                     .setTitle("Other's Top Items")
                     .setSubTitle("Sharing with you")
                     .setIconCss("fas fa-users")
@@ -31,8 +31,8 @@ public class NavBarService
                     .addNavItem("User 2", "#", "")
                     .addNavItem("User 3", "#", "")
             );
-            add(new Divider().setCss("my-0"));
-            add(new CollapsibleNavItem()
+            add(new DividerDto().setCss("my-0"));
+            add(new CollapsibleNavItemDto()
                     .setTitle("Other's Requests")
                     .setSubTitle("Waiting for your accept")
                     .setIconCss("fas fa-envelope")
@@ -40,8 +40,8 @@ public class NavBarService
                     .addNavItem("User 5", "#", "")
                     .addNavItem("User 6", "#", "")
             );
-            add(new Divider().setCss("my-0"));
-            add(new CollapsibleNavItem()
+            add(new DividerDto().setCss("my-0"));
+            add(new CollapsibleNavItemDto()
                     .setTitle("Your Requests")
                     .setSubTitle("Waiting for accept")
                     .setIconCss("fas fa-envelope")
@@ -49,7 +49,7 @@ public class NavBarService
                     .addNavItem("User 8", "#", "")
                     .addNavItem("User 9", "#", "")
             );
-            add(new Divider());
+            add(new DividerDto());
         }};
     }
 
