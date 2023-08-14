@@ -1,20 +1,21 @@
 <th:block th:fragment="topItemsGallery (topItems)" xmlns:th="http://www.w3.org/1999/html">
-    <th:block th:each="artistsRow : ${topItems.getArtistsAsRows(3)}">
-        <div class="row">
-            <th:block th:each="artist : ${artistsRow}">
-                <div class="col-xl-4 col-lg-5">
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                            <h6 class="m-0 font-weight-bold text-primary" th:text="${artist.getName()}"></h6>
+        <div th:each="artistsRow : ${topItems.getArtistsAsRows(3)}" class="row">
+            <div th:each="artist : ${artistsRow}" class="col-xl-12 col-lg-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary" th:text="${artist.getName()}"></h6>
+                    </div>
+                    <div class="card-body flex-container">
+                        <div class="img-container" th:if="${artist.getImages().size() > 0}">
+                            <img th:src="${artist.getImages()[0]}" class="img-fluid" />
                         </div>
-                        <div class="card-body">
-                            <th:block th:if="${artist.getImages().size() > 0}">
-                                <img th:src="${artist.getImages()[0]}" class="img-fluid" />
-                            </th:block>
+                        <div class="content-container">
+                            <ul class="list-group">
+                                <li th:each="track: ${artist.getTracks()}" class="list-group-item" th:text="${track.getName()}"></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
-            </th:block>
+            </div>
         </div>
-    </th:block>
 </th:block>

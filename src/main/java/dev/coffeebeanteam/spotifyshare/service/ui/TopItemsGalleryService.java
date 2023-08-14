@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 @Service @Getter @Setter @Accessors(chain = true)
 public class TopItemsGalleryService {
@@ -39,15 +42,42 @@ public class TopItemsGalleryService {
 
         final TopItemsGalleryDto topItemsGallery = new TopItemsGalleryDto();
 
-        for (final UserTopItem item: topItems) {
-            if (item.getType().equals("artist")) {
-                final TopItemsGalleryDto.Artist artist = new TopItemsGalleryDto.Artist()
-                        .setName(item.getName())
-                        .setImages(new ArrayList<>(item.getImages()));
+        final Stream<UserTopItem> artists = topItems.stream().filter(artist -> artist.getType().equals("artist"));
 
-                topItemsGallery.getArtists().add(artist);
-            }
-        }
+        final Stream<UserTopItem> tracks = topItems.stream().filter(artist -> artist.getType().equals("track"));
+
+        final Map<String, TopItemsGalleryDto.Artist> spotifyIdToArtist = new HashMap<>();
+
+        artists.forEach(
+                artist -> {
+                    final TopItemsGalleryDto.Artist topItemsArtist =
+                            new TopItemsGalleryDto.Artist()
+                                .setSpotifyId(artist.getSpotifyId())
+                                .setName(artist.getName())
+                                .setImages(new ArrayList<>(artist.getImages()));
+
+                    topItemsGallery.getArtists().add(topItemsArtist);
+
+                    spotifyIdToArtist.put(topItemsArtist.getSpotifyId(), topItemsArtist);
+                }
+        );
+
+        tracks.forEach(
+                track -> {
+                    track.getArtistSpotifyIds().stream().forEach(
+                            spotifyArtistId -> {
+                                final TopItemsGalleryDto.Artist trackArtist = spotifyIdToArtist.get(spotifyArtistId);
+
+                                if (trackArtist != null) {
+                                    trackArtist.getTracks().add(
+                                            new TopItemsGalleryDto.Track()
+                                                    .setName(track.getName())
+                                    );
+                                }
+                            }
+                    );
+                }
+        );
 
         return topItemsGallery;
     }

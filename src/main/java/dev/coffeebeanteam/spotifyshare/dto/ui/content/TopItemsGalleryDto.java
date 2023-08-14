@@ -17,6 +17,7 @@ public class TopItemsGalleryDto {
     }
     @Getter @Setter @NoArgsConstructor @Accessors(chain = true)
     public static class Artist {
+        private String spotifyId;
         private String name;
         private ArrayList<String> images = new ArrayList<>();
 

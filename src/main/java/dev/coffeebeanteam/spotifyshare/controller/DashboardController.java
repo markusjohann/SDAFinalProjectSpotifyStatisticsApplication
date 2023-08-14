@@ -42,8 +42,6 @@ public class DashboardController {
 
         topItemsGalleryService.setAuthorizedClient(authorizedClient).populateModelViewWithTopItems(model);
 
-        System.out.println(model.getAttribute("topItems"));
-
         return "dashboard";
     }
 }

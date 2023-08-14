@@ -26,8 +26,11 @@ public class UserTopItem {
     @Column
     private String name;
 
+    @ElementCollection
+    private List<String> artistSpotifyIds;
+
     @Column
-    private String artists;
+    private String spotifyId;
 
     @Column
     private Integer track_number;

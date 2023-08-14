@@ -20,9 +20,7 @@ public class UserAccountDetailsService {
 
     public UserAccountDetailsService populateViewModelWithUserDetails(Model model)
     {
-        final UserDto spotifyUser = spotifyApiService.getUser();
-
-        System.out.println(spotifyUser);
+        final UserDto spotifyUser = spotifyApiService.setAuthorizedClient(authorizedClient).getUser();
 
         model.addAttribute("userAccountName", spotifyUser.getDisplayName());
         model.addAttribute("userAccountImage",
