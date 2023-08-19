@@ -1,6 +1,6 @@
 package dev.coffeebeanteam.spotifyshare.controller;
 
-import dev.coffeebeanteam.spotifyshare.dto.UserAccountSearchResultDto;
+import dev.coffeebeanteam.spotifyshare.dto.ui.UserAccountDto;
 import dev.coffeebeanteam.spotifyshare.model.UserAccount;
 import dev.coffeebeanteam.spotifyshare.repository.UserAccountRepository;
 import dev.coffeebeanteam.spotifyshare.service.SharingService;
@@ -63,13 +63,13 @@ public class SharingController {
     }
 
     @GetMapping("/request/user-search")
-    public ResponseEntity<List<UserAccountSearchResultDto>> userSearch(
+    public ResponseEntity<List<UserAccountDto>> userSearch(
             @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
             @RequestParam String search
     ) {
         userAccountService.setAuthorizedClient(authorizedClient);
 
-        final List<UserAccountSearchResultDto> results = userAccountService.searchUsersByDisplayName(search);
+        final List<UserAccountDto> results = userAccountService.searchUsersByDisplayName(search);
 
         return ResponseEntity.ok(results);
     }
