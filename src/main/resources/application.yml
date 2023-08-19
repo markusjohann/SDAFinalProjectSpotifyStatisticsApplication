@@ -13,7 +13,7 @@ spring:
     host: mail.gandi.net
     port: 587
     username: info@pjohanson.dev
-    password: MailiTrull1ngB44r!
+    password: 
     properties:
       mail:
         smtp:
