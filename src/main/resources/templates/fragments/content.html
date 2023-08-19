@@ -9,9 +9,12 @@
         <h1 class="h3 mb-0 text-gray-800" th:text="${contentTitle}"></h1>
     </div>
 
-    <th:block if="${topItems instanceof T(dev.coffeebeanteam.spotifyshare.dto.ui.content.TopItemsGalleryDto}">
-        <th:block th:insert="fragments/content/top-items-gallery :: topItemsGallery (${topItems})"></th:block>
-    </th:block>
+    <th:block th:if="${userIsNotApproved}" th:insert="fragments/content/user-not-approved :: userNotApproved" />
+
+    <th:block
+            th:if="${topItems != null}"
+            th:insert="fragments/content/top-items-gallery :: topItemsGallery (${topItems})"
+    />
 
 </div>
 <!-- /.container-fluid -->
