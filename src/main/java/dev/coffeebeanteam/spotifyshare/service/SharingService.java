@@ -1,18 +1,23 @@
 package dev.coffeebeanteam.spotifyshare.service;
 
+import dev.coffeebeanteam.spotifyshare.dto.ui.UserAccountDto;
 import dev.coffeebeanteam.spotifyshare.model.SharingStatus;
 import dev.coffeebeanteam.spotifyshare.model.UserAccount;
 import dev.coffeebeanteam.spotifyshare.model.UserAccountSharing;
 import dev.coffeebeanteam.spotifyshare.model.UserAccountSharingKey;
-import dev.coffeebeanteam.spotifyshare.repository.UserAccountPairingRepository;
+import dev.coffeebeanteam.spotifyshare.repository.UserAccountSharingRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SharingService {
-    private final UserAccountPairingRepository userAccountPairingRepository;
+    private final UserAccountSharingRepository userAccountSharingRepository;
 
-    public SharingService(UserAccountPairingRepository userAccountPairingRepository) {
-        this.userAccountPairingRepository = userAccountPairingRepository;
+    public SharingService(UserAccountSharingRepository userAccountSharingRepository) {
+        this.userAccountSharingRepository = userAccountSharingRepository;
     }
 
     public SharingService requestSharing(UserAccount requester, UserAccount requestReceiver) {
@@ -26,7 +31,7 @@ public class SharingService {
                 .setRequestReceiver(requestReceiver)
                 .setStatus(SharingStatus.PENDING);
 
-        userAccountPairingRepository.save(pairing);
+        userAccountSharingRepository.save(pairing);
 
         return this;
     }
@@ -36,9 +41,9 @@ public class SharingService {
                 .setUserAccountIdRequester(requester.getId())
                 .setUserAccountIdReceiver(accepter.getId());
 
-        userAccountPairingRepository.findById(requestId).ifPresent(
+        userAccountSharingRepository.findById(requestId).ifPresent(
                 (UserAccountSharing request) -> {
-                    userAccountPairingRepository.save(
+                    userAccountSharingRepository.save(
                             new UserAccountSharing()
                                     .setId(
                                             new UserAccountSharingKey()
@@ -49,7 +54,7 @@ public class SharingService {
                                     .setStatus(SharingStatus.ACCEPTED)
                     );
 
-                    userAccountPairingRepository.save(request.setStatus(SharingStatus.ACCEPTED));
+                    userAccountSharingRepository.save(request.setStatus(SharingStatus.ACCEPTED));
                 }
         );
 
@@ -61,10 +66,30 @@ public class SharingService {
                 .setUserAccountIdRequester(requester.getId())
                 .setUserAccountIdReceiver(accepter.getId());
 
-        userAccountPairingRepository.findById(requestId).ifPresent(
-                (UserAccountSharing request) -> userAccountPairingRepository.delete(request)
+        userAccountSharingRepository.findById(requestId).ifPresent(
+                (UserAccountSharing request) -> userAccountSharingRepository.delete(request)
         );
 
         return this;
+    }
+
+    public List<UserAccountDto> getListOfPendingRequests(UserAccount requester) {
+        List<UserAccountSharing> pendingRequests = userAccountSharingRepository.findByRequesterAndStatus(requester, SharingStatus.PENDING);
+
+        return pendingRequests.stream()
+                .map(request -> new UserAccountDto()
+                        .setUserId(request.getRequestReceiver().getId())
+                        .setDisplayName(request.getRequestReceiver().getSpotifyUsername()))
+                .collect(Collectors.toList());
+    }
+
+    public List<UserAccountDto> getListOfToAcceptRequests(UserAccount requestReceiver) {
+        List<UserAccountSharing> toAcceptRequests = userAccountSharingRepository.findByRequestReceiverAndStatus(requestReceiver, SharingStatus.PENDING);
+
+        return toAcceptRequests.stream()
+                .map(request -> new UserAccountDto()
+                        .setUserId(request.getRequester().getId())
+                        .setDisplayName(request.getRequester().getSpotifyUsername()))
+                .collect(Collectors.toList());
     }
 }
