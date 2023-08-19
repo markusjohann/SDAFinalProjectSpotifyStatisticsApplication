@@ -1,1 +1,1 @@
-<hr class="sidebar-divider" th:fragment="divider">
+<hr th:class="${'sidebar-divider ' + item.getCss()}" th:fragment="divider (item)">

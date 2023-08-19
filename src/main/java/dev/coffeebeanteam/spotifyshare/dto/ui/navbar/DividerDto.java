@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Getter @Setter @NoArgsConstructor @Accessors(chain = true)
-public class Divider {
+public class DividerDto {
     private String title;
+    private String css;
 }
