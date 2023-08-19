@@ -1,0 +1,15 @@
+<th:block th:fragment="sharingRequestForm ()" xmlns:th="http://www.w3.org/1999/html">
+    <form>
+        <div class="dropdown-container">
+            <input type="text" id="sharing-request-search-input" placeholder="Search for a user">
+            <div class="dropdown-results" id="sharing-request-search-results">
+            </div>
+        </div>
+    </form>
+
+    <script src="/js/sharing-request-search.js"></script>
+
+    <script>
+        initializeSharingRequestUserSearch();
+    </script>
+</th:block>

@@ -1,12 +1,14 @@
-<!-- Begin Page Content -->
 <div
         class="container-fluid"
         th:fragment="contentContainer ()"
 >
 
-    <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800" th:text="${contentTitle}"></h1>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success">
+        <p th:text="${successMessage}"></p>
     </div>
 
     <th:block th:if="${userIsNotApproved}" th:insert="fragments/content/user-not-approved :: userNotApproved" />
@@ -15,6 +17,8 @@
             th:if="${topItems != null}"
             th:insert="fragments/content/top-items-gallery :: topItemsGallery (${topItems})"
     />
+
+    <th:block th:if="${showSharingRequestForm}" th:insert="fragments/content/sharing-request :: sharingRequestForm" />
 
 </div>
 <!-- /.container-fluid -->

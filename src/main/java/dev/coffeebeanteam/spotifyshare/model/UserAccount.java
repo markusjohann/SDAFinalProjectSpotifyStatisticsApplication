@@ -28,11 +28,4 @@ public class UserAccount {
     private boolean approved = true;
 
     private boolean approvalEmailSent = false;
-
-    @OneToMany(mappedBy = "userAccountOne")
-    private Set<UserAccountPairing> requestAcceptedOne;
-    @OneToMany(mappedBy = "userAccountTwo")
-    private Set<UserAccountPairing> requestAcceptedTwo;
-
-
 }

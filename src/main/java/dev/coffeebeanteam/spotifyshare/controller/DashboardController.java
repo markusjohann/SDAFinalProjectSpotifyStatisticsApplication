@@ -42,6 +42,6 @@ public class DashboardController {
 
         topItemsGalleryService.setAuthorizedClient(authorizedClient).populateModelViewWithTopItems(model);
 
-        return "dashboard";
+        return "default-page";
     }
 }
