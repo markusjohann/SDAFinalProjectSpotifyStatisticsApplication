@@ -33,11 +33,16 @@ public class TopItemsGalleryService {
         this.userAccountService = userAccountService;
     }
 
-    public TopItemsGalleryDto getTopItemsGalleryDto() {
+    public TopItemsGalleryDto getLoggedInUserTopItemsGalleryDto() {
         final UserAccount userAccount = this.userAccountService
                 .setAuthorizedClient(this.getAuthorizedClient())
                 .getLoggedInUserAccount();
 
+        return getUserTopItemsGalleryDto(userAccount);
+    }
+
+    public TopItemsGalleryDto getUserTopItemsGalleryDto(final UserAccount userAccount)
+    {
         final List<UserTopItem> topItems = this.topItemsService.getTopItemsByUser(userAccount);
 
         final TopItemsGalleryDto topItemsGallery = new TopItemsGalleryDto();
@@ -52,9 +57,9 @@ public class TopItemsGalleryService {
                 artist -> {
                     final TopItemsGalleryDto.Artist topItemsArtist =
                             new TopItemsGalleryDto.Artist()
-                                .setSpotifyId(artist.getSpotifyId())
-                                .setName(artist.getName())
-                                .setImages(new ArrayList<>(artist.getImages()));
+                                    .setSpotifyId(artist.getSpotifyId())
+                                    .setName(artist.getName())
+                                    .setImages(new ArrayList<>(artist.getImages()));
 
                     topItemsGallery.getArtists().add(topItemsArtist);
 
@@ -79,11 +84,13 @@ public class TopItemsGalleryService {
                 }
         );
 
+        topItemsGallery.removeArtistsWithoutTracks();
+
         return topItemsGallery;
     }
 
     public TopItemsGalleryService populateModelViewWithTopItems(Model model) {
-        model.addAttribute("topItems", getTopItemsGalleryDto());
+        model.addAttribute("topItems", getLoggedInUserTopItemsGalleryDto());
 
         return this;
     }
