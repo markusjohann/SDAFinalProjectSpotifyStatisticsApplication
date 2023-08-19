@@ -1,6 +1,6 @@
 package dev.coffeebeanteam.spotifyshare.service;
 
-import dev.coffeebeanteam.spotifyshare.dto.UserAccountSearchResultDto;
+import dev.coffeebeanteam.spotifyshare.dto.ui.UserAccountDto;
 import dev.coffeebeanteam.spotifyshare.model.UserAccount;
 import dev.coffeebeanteam.spotifyshare.repository.UserAccountRepository;
 import org.springframework.data.domain.Page;
@@ -39,7 +39,7 @@ public class UserAccountService {
         return userAccountRepository.findBySpotifyPrincipalName(principalName).orElseThrow();
     }
 
-    public List<UserAccountSearchResultDto> searchUsersByDisplayName(final String search)
+    public List<UserAccountDto> searchUsersByDisplayName(final String search)
     {
         final UserAccount loggedInUserAccount = getLoggedInUserAccount();
 
@@ -53,7 +53,7 @@ public class UserAccountService {
         return foundAccounts.stream()
                 .filter(account -> account.getId() != loggedInUserAccount.getId())
                 .map(account -> {
-                    UserAccountSearchResultDto dto = new UserAccountSearchResultDto();
+                    UserAccountDto dto = new UserAccountDto();
                     dto.setUserId(account.getId());
                     dto.setDisplayName(account.getSpotifyUsername());
                     return dto;
