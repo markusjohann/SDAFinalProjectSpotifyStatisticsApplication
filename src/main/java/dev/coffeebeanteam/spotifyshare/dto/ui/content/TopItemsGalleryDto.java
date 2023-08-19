@@ -37,6 +37,18 @@ public class TopItemsGalleryDto {
         return ListUtils.partition(artists, artistsPerRow);
     }
 
+    public TopItemsGalleryDto removeArtistsWithoutTracks() {
+        setArtists(
+                new ArrayList<>(
+                    artists.stream().filter(
+                            artist -> artist.getTracks().size() > 0
+                    ).toList()
+                )
+        );
+
+        return this;
+    }
+
     private ArrayList<Artist> artists = new ArrayList<>();
 
     @Override
