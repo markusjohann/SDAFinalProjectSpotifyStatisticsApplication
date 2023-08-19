@@ -21,15 +21,33 @@
     <style>
         .flex-container {
             display: flex;
+            flex-direction: row;
         }
 
         .flex-container > div {
             width: 50%;
         }
 
+        .img-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
         .img-container img {
-            width: 100%;
-            height: auto;
+            max-width: 100%;
+            max-height: 50vh;
+        }
+
+        /* Media query for smaller screens */
+        @media (max-width: 768px) { /* This breakpoint is commonly used for tablets and below */
+            .flex-container > div {
+                width: 100%;
+            }
+
+            .flex-container {
+                flex-direction: column; /* This will stack the image and list on top of each other */
+            }
         }
     </style>
 
