@@ -18,7 +18,7 @@ import java.util.List;
 public class UserTopItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @ManyToOne
     private UserAccount userAccount;
