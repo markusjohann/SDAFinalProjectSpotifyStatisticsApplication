@@ -20,5 +20,10 @@
 
     <th:block th:if="${showSharingRequestForm}" th:insert="fragments/content/sharing-request :: sharingRequestForm" />
 
+    <th:block
+            th:if="${acceptShareRequestUserAccountDto != null}"
+            th:insert="fragments/content/accept-or-reject-request :: acceptOrRejectSharingRequest (${acceptShareRequestUserAccountDto})"
+    />
+
 </div>
 <!-- /.container-fluid -->

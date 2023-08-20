@@ -1,11 +1,16 @@
 package dev.coffeebeanteam.spotifyshare.controller;
 
 import dev.coffeebeanteam.spotifyshare.dto.ui.UserAccountDto;
+import dev.coffeebeanteam.spotifyshare.model.SharingStatus;
 import dev.coffeebeanteam.spotifyshare.model.UserAccount;
+import dev.coffeebeanteam.spotifyshare.model.UserAccountSharing;
+import dev.coffeebeanteam.spotifyshare.model.UserAccountSharingKey;
 import dev.coffeebeanteam.spotifyshare.repository.UserAccountRepository;
+import dev.coffeebeanteam.spotifyshare.repository.UserAccountSharingRepository;
 import dev.coffeebeanteam.spotifyshare.service.SharingService;
 import dev.coffeebeanteam.spotifyshare.service.UserAccountService;
 import dev.coffeebeanteam.spotifyshare.service.ui.NavBarService;
+import dev.coffeebeanteam.spotifyshare.service.ui.TopItemsGalleryService;
 import dev.coffeebeanteam.spotifyshare.service.ui.UserAccountDetailsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,21 +33,67 @@ public class SharingController {
     private UserAccountDetailsService userAccountDetailsService;
     private UserAccountRepository userAccountRepository;
     private SharingService sharingService;
+    private UserAccountSharingRepository userAccountSharingRepository;
 
     private UserAccountService userAccountService;
+
+    private TopItemsGalleryService topItemsGalleryService;
 
     public SharingController(
             NavBarService navBarService,
             UserAccountDetailsService userAccountDetailsService,
             SharingService sharingService,
             UserAccountService userAccountService,
-            UserAccountRepository userAccountRepository
+            UserAccountRepository userAccountRepository,
+            UserAccountSharingRepository userAccountSharingRepository,
+            TopItemsGalleryService topItemsGalleryService
     ) {
         this.navBarService = navBarService;
         this.userAccountDetailsService = userAccountDetailsService;
         this.sharingService = sharingService;
         this.userAccountService = userAccountService;
         this.userAccountRepository = userAccountRepository;
+        this.userAccountSharingRepository = userAccountSharingRepository;
+        this.topItemsGalleryService = topItemsGalleryService;
+    }
+
+    @GetMapping("/view")
+    public String sharingView(
+            @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
+            @RequestParam Long accountId,
+            Model model
+    ) {
+        userAccountService.setAuthorizedClient(authorizedClient);
+
+        final UserAccount loggedInUser = userAccountService.getLoggedInUserAccount();
+
+        final UserAccountSharingKey userAccountSharingKey = new UserAccountSharingKey()
+                .setUserAccountIdReceiver(accountId)
+                .setUserAccountIdRequester(loggedInUser.getId());
+
+        final UserAccountSharing userAccountSharing = userAccountSharingRepository.findById(userAccountSharingKey)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account sharing not found"));
+
+        if (userAccountSharing.getStatus() != SharingStatus.ACCEPTED) {
+            new ResponseStatusException(HttpStatus.FORBIDDEN, "User account sharing not accepted");
+        }
+
+        final String sharerName = userAccountSharing.getRequestReceiver().getSpotifyUsername();
+
+        model
+                .addAttribute("pageTitle", "Top Artists and Tracks of " + sharerName)
+                .addAttribute("contentTitle", "Top Artists and Tracks of " + sharerName);
+
+        navBarService.populateViewModelWithNavBarItems(model);
+
+        userAccountDetailsService.setAuthorizedClient(authorizedClient).populateViewModelWithUserDetails(model);
+
+        topItemsGalleryService.setAuthorizedClient(authorizedClient).populateModelViewWithTopItems(
+                model,
+                userAccountSharing.getRequestReceiver()
+        );
+
+        return "default-page";
     }
 
     @GetMapping("/request")
@@ -54,6 +105,8 @@ public class SharingController {
                 .addAttribute("pageTitle", "Make a Sharing Request")
                 .addAttribute("contentTitle", "Make a Sharing Request")
                 .addAttribute("showSharingRequestForm", true);
+
+        userAccountService.setAuthorizedClient(authorizedClient);
 
         navBarService.populateViewModelWithNavBarItems(model);
 
@@ -88,6 +141,69 @@ public class SharingController {
         sharingService.requestSharing(userAccountService.getLoggedInUserAccount(), requestReceiver);
 
         redirectAttributes.addFlashAttribute("successMessage", "Sharing request made successfully!");
+
+        return "redirect:/dashboard";
+    }
+
+    @GetMapping("/request/accept-view")
+    public String acceptRequestView(
+            @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
+            @RequestParam Long accountId,
+            Model model
+    ) {
+        userAccountService.setAuthorizedClient(authorizedClient);
+
+        final UserAccount loggedInUser = userAccountService.getLoggedInUserAccount();
+
+        final UserAccountDto toAcceptUser = sharingService.getListOfToAcceptRequests(loggedInUser)
+                .stream().filter(userAccountDto -> userAccountDto.getUserId() == accountId).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account not found"));
+
+        navBarService.populateViewModelWithNavBarItems(model);
+
+        userAccountDetailsService.setAuthorizedClient(authorizedClient).populateViewModelWithUserDetails(model);
+
+        model
+                .addAttribute("pageTitle", "Accept or Reject a Sharing Request")
+                .addAttribute("contentTitle", "Accept or Reject a Sharing Request")
+                .addAttribute("acceptShareRequestUserAccountDto", toAcceptUser);
+
+
+        return "default-page";
+    }
+
+    @GetMapping("/request/accept")
+    public String acceptRequest(
+            @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
+            @RequestParam Long accountId,
+            RedirectAttributes redirectAttributes
+    ) {
+        userAccountService.setAuthorizedClient(authorizedClient);
+
+        final UserAccount toAccept = userAccountRepository.findById(accountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account not found"));
+
+        sharingService.acceptSharingRequest(userAccountService.getLoggedInUserAccount(), toAccept);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Sharing request accepted!");
+
+        return "redirect:/dashboard";
+    }
+
+    @GetMapping("/request/reject")
+    public String rejectRequest(
+            @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
+            @RequestParam Long accountId,
+            RedirectAttributes redirectAttributes
+    ) {
+        userAccountService.setAuthorizedClient(authorizedClient);
+
+        final UserAccount toAccept = userAccountRepository.findById(accountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account not found"));
+
+        sharingService.rejectSharingRequest(userAccountService.getLoggedInUserAccount(), toAccept);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Sharing request rejected!");
 
         return "redirect:/dashboard";
     }

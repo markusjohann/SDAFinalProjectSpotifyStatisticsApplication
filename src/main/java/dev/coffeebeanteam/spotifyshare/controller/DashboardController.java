@@ -1,8 +1,10 @@
 package dev.coffeebeanteam.spotifyshare.controller;
 
+import dev.coffeebeanteam.spotifyshare.service.UserAccountService;
 import dev.coffeebeanteam.spotifyshare.service.ui.NavBarService;
 import dev.coffeebeanteam.spotifyshare.service.ui.TopItemsGalleryService;
 import dev.coffeebeanteam.spotifyshare.service.ui.UserAccountDetailsService;
+import org.apache.catalina.User;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
@@ -17,14 +19,18 @@ public class DashboardController {
     private UserAccountDetailsService userAccountDetailsService;
     private TopItemsGalleryService topItemsGalleryService;
 
+    private UserAccountService userAccountService;
+
     public DashboardController(
             NavBarService navBarService,
             UserAccountDetailsService userAccountDetailsService,
-            TopItemsGalleryService topItemsGalleryService
+            TopItemsGalleryService topItemsGalleryService,
+            UserAccountService userAccountService
     ) {
         this.navBarService = navBarService;
         this.userAccountDetailsService = userAccountDetailsService;
         this.topItemsGalleryService = topItemsGalleryService;
+        this.userAccountService = userAccountService;
     }
 
     @GetMapping
@@ -35,6 +41,8 @@ public class DashboardController {
         model
                 .addAttribute("pageTitle", "Dashboard")
                 .addAttribute("contentTitle", "Dashboard");
+
+        userAccountService.setAuthorizedClient(authorizedClient);
 
         navBarService.populateViewModelWithNavBarItems(model);
 

@@ -94,4 +94,11 @@ public class TopItemsGalleryService {
 
         return this;
     }
+
+    public TopItemsGalleryService populateModelViewWithTopItems(Model model, UserAccount userAccount)
+    {
+        model.addAttribute("topItems", getUserTopItemsGalleryDto(userAccount));
+
+        return this;
+    }
 }

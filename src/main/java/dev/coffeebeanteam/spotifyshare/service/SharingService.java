@@ -73,7 +73,10 @@ public class SharingService {
     }
 
     public List<UserAccountDto> getListOfPendingRequests(UserAccount requester) {
-        List<UserAccountSharing> pendingRequests = userAccountSharingRepository.findByRequesterAndStatus(requester, SharingStatus.PENDING);
+        List<UserAccountSharing> pendingRequests = userAccountSharingRepository.findByRequesterAndStatus(
+                requester,
+                SharingStatus.PENDING
+        );
 
         return pendingRequests.stream()
                 .map(request -> new UserAccountDto()
@@ -83,12 +86,27 @@ public class SharingService {
     }
 
     public List<UserAccountDto> getListOfToAcceptRequests(UserAccount requestReceiver) {
-        List<UserAccountSharing> toAcceptRequests = userAccountSharingRepository.findByRequestReceiverAndStatus(requestReceiver, SharingStatus.PENDING);
+        List<UserAccountSharing> toAcceptRequests = userAccountSharingRepository.findByRequestReceiverAndStatus(
+                requestReceiver, SharingStatus.PENDING);
 
         return toAcceptRequests.stream()
                 .map(request -> new UserAccountDto()
                         .setUserId(request.getRequester().getId())
                         .setDisplayName(request.getRequester().getSpotifyUsername()))
                 .collect(Collectors.toList());
+    }
+
+    public List<UserAccountDto> getListOfSharingUserAccounts(UserAccount loggedInUser) {
+        List<UserAccountSharing> acceptedRequests = userAccountSharingRepository.findByRequesterAndStatus(
+                loggedInUser,
+                SharingStatus.ACCEPTED
+        );
+
+        return acceptedRequests.stream()
+                .map(request -> new UserAccountDto()
+                        .setUserId(request.getRequestReceiver().getId())
+                        .setDisplayName(request.getRequestReceiver().getSpotifyUsername()))
+                .collect(Collectors.toList());
+
     }
 }

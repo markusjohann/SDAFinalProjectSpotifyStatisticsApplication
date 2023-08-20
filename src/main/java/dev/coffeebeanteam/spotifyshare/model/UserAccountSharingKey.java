@@ -9,7 +9,6 @@ import java.io.Serializable;
 
 @Embeddable @Getter @Setter @NoArgsConstructor @Accessors(chain = true)
 public class UserAccountSharingKey implements Serializable {
-
     @Column(name="user_account_id_requester")
     private long userAccountIdRequester;
     @Column(name="user_account_id_receiver")

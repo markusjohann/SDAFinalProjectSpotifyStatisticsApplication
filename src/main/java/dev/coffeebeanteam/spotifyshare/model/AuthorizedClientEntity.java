@@ -10,7 +10,6 @@ import java.time.Instant;
 
 @Entity @Getter @Setter @NoArgsConstructor
 public class AuthorizedClientEntity {
-
     @Id
     private String clientRegistrationId;
 
