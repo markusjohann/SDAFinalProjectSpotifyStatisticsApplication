@@ -35,6 +35,11 @@ class SecurityConfiguration {
         httpSecurity.authorizeHttpRequests(
                 auth -> auth.requestMatchers(new AntPathRequestMatcher("/login-page.html")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/vendor/*")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/vendor/jquery/*")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/vendor/bootstrap/js/*")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/vendor/jquery-easing/*")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/vendor/fontawesome-free/css/*")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/vendor/fontawesome-free/webfonts/*")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/js/*")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/css/*")).permitAll()
                         .anyRequest().authenticated()
