@@ -11,6 +11,8 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -31,11 +33,17 @@ class SecurityConfiguration {
         httpSecurity.csrf(csrf -> csrf.disable());
 
         httpSecurity.authorizeHttpRequests(
-                auth -> auth.anyRequest().authenticated()
+                auth -> auth.requestMatchers(new AntPathRequestMatcher("/login-page.html")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/vendor/*")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/js/*")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/css/*")).permitAll()
+                        .anyRequest().authenticated()
+
         );
 
         httpSecurity.oauth2Login(oa2login -> oa2login
                 .defaultSuccessUrl("/dashboard", true)
+                .loginPage("/login-page.html")
         );
 
         return httpSecurity.build();
