@@ -77,6 +77,7 @@ public class TopItemsGalleryService {
                                     trackArtist.getTracks().add(
                                             new TopItemsGalleryDto.Track()
                                                     .setName(track.getName())
+                                                    .setSpotifyId(track.getSpotifyId())
                                     );
                                 }
                             }

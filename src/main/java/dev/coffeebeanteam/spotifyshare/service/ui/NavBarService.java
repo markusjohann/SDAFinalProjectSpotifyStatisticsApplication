@@ -40,6 +40,11 @@ public class NavBarService
                 .setTitle("Dashboard")
                 .setIconCss("fas fa-fw fa-music");
 
+        final NavItemDto sharingRequestItem = new NavItemDto()
+                .setLink("/sharing/request")
+                .setTitle("Make Request")
+                .setIconCss("fas fa-user");
+
         final DividerDto divider2 = new DividerDto();
 
         final HeadingDto heading = new HeadingDto().setTitle("Sharing");
@@ -100,6 +105,7 @@ public class NavBarService
         list.add(dashboardItem);
         list.add(divider2);
         list.add(heading);
+        list.add(sharingRequestItem);
         list.add(othersTopItems);
         list.add(divider3);
         list.add(othersRequests);

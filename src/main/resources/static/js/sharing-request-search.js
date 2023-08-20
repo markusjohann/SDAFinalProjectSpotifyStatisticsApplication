@@ -31,7 +31,7 @@ function initializeSharingRequestUserSearch() {
         if (searchInput.value) {
             fetchUserSearchResults(searchInput.value);
         } else {
-            resultsDiv.innerHTML = '<div>Please enter a keyword</div>';
+            resultsDiv.innerHTML = '<div>Please enter username to search for</div>';
             resultsDiv.style.display = 'block';
         }
     });

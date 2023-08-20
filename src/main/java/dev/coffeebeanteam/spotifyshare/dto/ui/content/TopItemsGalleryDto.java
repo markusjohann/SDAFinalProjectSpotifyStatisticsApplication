@@ -14,6 +14,7 @@ public class TopItemsGalleryDto {
     @Getter @Setter @NoArgsConstructor @Accessors(chain = true)
     public static class Track {
         private String name;
+        private String spotifyId;
     }
     @Getter @Setter @NoArgsConstructor @Accessors(chain = true)
     public static class Artist {

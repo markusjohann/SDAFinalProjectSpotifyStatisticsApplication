@@ -3,7 +3,12 @@
             <div th:each="artist : ${artistsRow}" class="col-xl-6 col-lg-12">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary" th:text="${artist.getName()}"></h6>
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <a th:text="${artist.getName()}"
+                               th:href="${'https://open.spotify.com/artist/' + artist.getSpotifyId()}"
+                               target="_blank"
+                            />
+                        </h6>
                     </div>
                     <div class="card-body flex-container">
                         <div class="img-container" th:if="${artist.getImages().size() > 0}">
@@ -11,7 +16,17 @@
                         </div>
                         <div class="content-container">
                             <ul class="list-group">
-                                <li th:each="track: ${artist.getTracks()}" class="list-group-item" th:text="${track.getName()}"></li>
+                                <li
+                                        th:each="track: ${artist.getTracks()}"
+                                        class="list-group-item"
+                                >
+                                    <a
+                                            th:href="${'https://open.spotify.com/track/' + track.getSpotifyId()}"
+                                            th:text="${track.getName()}"
+                                            target="_blank"
+                                    />
+
+                                </li>
                             </ul>
                         </div>
                     </div>
