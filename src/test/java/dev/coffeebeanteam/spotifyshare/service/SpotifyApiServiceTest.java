@@ -4,7 +4,6 @@ import dev.coffeebeanteam.spotifyshare.dto.UserDto;
 import dev.coffeebeanteam.spotifyshare.dto.TopItemsResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -79,6 +78,7 @@ class SpotifyApiServiceTest {
     }
 
     @Test
+
     void getTopArtists() {
         TopItemsResponseDto expectedResponse = new TopItemsResponseDto(); // ... some setup code
         when(responseSpec.bodyToMono(TopItemsResponseDto.class)).thenReturn(Mono.just(expectedResponse));
