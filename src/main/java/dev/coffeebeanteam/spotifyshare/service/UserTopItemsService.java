@@ -2,7 +2,6 @@ package dev.coffeebeanteam.spotifyshare.service;
 
 import dev.coffeebeanteam.spotifyshare.dto.TopItemDto;
 import dev.coffeebeanteam.spotifyshare.dto.TopItemsResponseDto;
-import dev.coffeebeanteam.spotifyshare.dto.TrackArtistDto;
 import dev.coffeebeanteam.spotifyshare.model.UserAccount;
 import dev.coffeebeanteam.spotifyshare.model.UserTopItem;
 import dev.coffeebeanteam.spotifyshare.repository.UserTopItemsRepository;
