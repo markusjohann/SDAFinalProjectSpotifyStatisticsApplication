@@ -37,19 +37,23 @@ class SpotifyApiServiceTest {
     @Mock
     private OAuth2AuthorizedClient authorizedClient;
 
-    @InjectMocks
     private SpotifyApiService spotifyApiService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+
         when(webClientBuilder.baseUrl(anyString())).thenReturn(webClientBuilder);
         when(webClientBuilder.build()).thenReturn(webClient);
+
+        spotifyApiService = new SpotifyApiService(webClientBuilder);
+
         when(webClient.get()).thenReturn(requestHeadersUriSpec);
         when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.headers(any())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
     }
+
 
     @Test
     void getToken_whenTokenIsNullAndAuthorizedClientIsNotNull() {
@@ -115,16 +119,6 @@ class SpotifyApiServiceTest {
         OAuth2AuthorizedClient result = spotifyApiService.getAuthorizedClient();
 
         assertEquals(expectedAuthorizedClient, result);
-    }
-
-    @Test
-    void getWebClient() {
-        WebClient expectedWebClient = mock(WebClient.class);
-        when(webClientBuilder.build()).thenReturn(expectedWebClient);
-
-        WebClient result = spotifyApiService.getWebClient();
-
-        assertEquals(expectedWebClient, result);
     }
 
     @Test
