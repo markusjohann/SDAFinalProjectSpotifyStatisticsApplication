@@ -24,13 +24,18 @@ public class SharingService {
                 .setUserAccountIdRequester(requester.getId())
                 .setUserAccountIdReceiver(requestReceiver.getId());
 
-        final UserAccountSharing pairing = new UserAccountSharing()
-                .setId(requestId)
-                .setRequester(requester)
-                .setRequestReceiver(requestReceiver)
-                .setStatus(SharingStatus.PENDING);
+        userAccountSharingRepository.findById(requestId).ifPresentOrElse(
+                (existingSharing) -> {},
+                () -> {
+                    final UserAccountSharing pairing = new UserAccountSharing()
+                            .setId(requestId)
+                            .setRequester(requester)
+                            .setRequestReceiver(requestReceiver)
+                            .setStatus(SharingStatus.PENDING);
 
-        userAccountSharingRepository.save(pairing);
+                    userAccountSharingRepository.save(pairing);
+                }
+        );
 
         return this;
     }
