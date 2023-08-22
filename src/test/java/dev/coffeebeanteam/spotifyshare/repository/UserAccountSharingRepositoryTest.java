@@ -44,7 +44,7 @@ public class UserAccountSharingRepositoryTest {
                         .setUserAccountIdReceiver(receiver.getId())
                         .setUserAccountIdRequester(requester.getId()))                .setRequester(requester)
                 .setRequestReceiver(receiver)
-                .setStatus(SharingStatus.PENDING);  // Assuming SharingStatus enum has this value
+                .setStatus(SharingStatus.PENDING);
 
         entityManager.persist(sharing);
 
@@ -75,7 +75,7 @@ public class UserAccountSharingRepositoryTest {
                         .setUserAccountIdRequester(requester.getId()))
                 .setRequester(requester)
                 .setRequestReceiver(receiver)
-                .setStatus(SharingStatus.PENDING);  // Assuming SharingStatus enum has this value
+                .setStatus(SharingStatus.PENDING);
 
         entityManager.persist(sharing);
 
