@@ -45,7 +45,7 @@ class TopItemsGalleryServiceTest {
     @Test
     void getLoggedInUserTopItemsGalleryDtoTest() {
         UserAccount userAccount = new UserAccount();
-        List<UserTopItem> topItems = new ArrayList<>(); // Modify the list as per your needs
+        List<UserTopItem> topItems = new ArrayList<>();
 
         when(userAccountService.getLoggedInUserAccount()).thenReturn(userAccount);
         when(topItemsService.getTopItemsByUser(any())).thenReturn(topItems);
