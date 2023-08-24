@@ -94,13 +94,13 @@ public class DashboardControllerTest {
         )).thenReturn(authorizedClient);
 
         UserDto mockUserDto = new UserDto();
-        TopItemsGalleryDto topItemsGalleryDto = new TopItemsGalleryDto();
+        TopItemsGalleryDto mockTopItemsGalleryDto = new TopItemsGalleryDto();
 
         when(spotifyApiService.setAuthorizedClient(any())).thenReturn(spotifyApiService);
         when(spotifyApiService.getUser()).thenReturn(mockUserDto);
 
         when(topItemsGalleryService.setAuthorizedClient(any())).thenReturn(topItemsGalleryService);
-        when(topItemsGalleryService.getUserTopItemsGalleryDto(any())).thenReturn(topItemsGalleryDto);
+        when(topItemsGalleryService.getUserTopItemsGalleryDto(any())).thenReturn(mockTopItemsGalleryDto);
     }
 
     private OAuth2AuthenticationToken getOauth2AuthenticationToken(OAuth2AuthorizedClient authorizedClient) {
