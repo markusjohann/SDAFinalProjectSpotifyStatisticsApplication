@@ -55,6 +55,8 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             } catch (WebClientResponseException e) {
                 if (e.getStatusCode() == HttpStatusCode.valueOf(403)) {
                     handleUnapprovedUser(spotifyUser, principalName, displayName);
+                } else {
+                    throw e;
                 }
             }
         }
