@@ -4,7 +4,6 @@ import dev.coffeebeanteam.spotifyshare.service.UserAccountService;
 import dev.coffeebeanteam.spotifyshare.service.ui.NavBarService;
 import dev.coffeebeanteam.spotifyshare.service.ui.TopItemsGalleryService;
 import dev.coffeebeanteam.spotifyshare.service.ui.UserAccountDetailsService;
-import org.apache.catalina.User;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
