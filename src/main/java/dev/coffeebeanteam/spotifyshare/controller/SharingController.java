@@ -12,6 +12,7 @@ import dev.coffeebeanteam.spotifyshare.service.UserAccountService;
 import dev.coffeebeanteam.spotifyshare.service.ui.NavBarService;
 import dev.coffeebeanteam.spotifyshare.service.ui.TopItemsGalleryService;
 import dev.coffeebeanteam.spotifyshare.service.ui.UserAccountDetailsService;
+import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -80,7 +81,7 @@ public class SharingController {
 
         final UserAccountSharing userAccountSharingReverse =
                 userAccountSharingRepository.findById(userAccountSharingReverseKey)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account sharing not found"));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account sharing not found"));
 
         if (userAccountSharing.getStatus() != SharingStatus.ACCEPTED) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account sharing not accepted");
@@ -94,7 +95,9 @@ public class SharingController {
 
         model
                 .addAttribute("pageTitle", "Top Artists and Tracks of " + sharerName)
-                .addAttribute("contentTitle", "Top Artists and Tracks of " + sharerName);
+                .addAttribute("contentTitle", "Top Artists and Tracks of " + sharerName)
+                .addAttribute("sharerName", sharerName)
+                .addAttribute("sharerUserId", userAccountSharing.getRequestReceiver().getId());
 
         navBarService.populateViewModelWithNavBarItems(model);
 
@@ -219,4 +222,33 @@ public class SharingController {
 
         return "redirect:/dashboard";
     }
+
+    @GetMapping("/cancel")
+    public String cancelSharing( @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
+                                 @RequestParam Long accountId,
+                                 RedirectAttributes redirectAttributes){
+
+        userAccountService.setAuthorizedClient(authorizedClient);
+
+        final UserAccount loggedInUser = userAccountService.getLoggedInUserAccount();
+
+        final UserAccount toCancel = userAccountRepository.findById(accountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account not found"));
+
+        final UserAccountSharingKey requesterKey = new UserAccountSharingKey()
+                .setUserAccountIdRequester(loggedInUser.getId())
+                .setUserAccountIdReceiver(toCancel.getId());
+
+        final UserAccountSharingKey receiverKey = new UserAccountSharingKey()
+                .setUserAccountIdRequester(toCancel.getId())
+                .setUserAccountIdReceiver(loggedInUser.getId());
+
+        userAccountSharingRepository.deleteById(requesterKey);
+        userAccountSharingRepository.deleteById(receiverKey);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Sharing successfully canceled!");
+
+        return "redirect:/dashboard";
+    }
+
 }
