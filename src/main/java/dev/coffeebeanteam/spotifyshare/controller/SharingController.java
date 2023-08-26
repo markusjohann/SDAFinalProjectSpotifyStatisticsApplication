@@ -12,7 +12,6 @@ import dev.coffeebeanteam.spotifyshare.service.UserAccountService;
 import dev.coffeebeanteam.spotifyshare.service.ui.NavBarService;
 import dev.coffeebeanteam.spotifyshare.service.ui.TopItemsGalleryService;
 import dev.coffeebeanteam.spotifyshare.service.ui.UserAccountDetailsService;
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;

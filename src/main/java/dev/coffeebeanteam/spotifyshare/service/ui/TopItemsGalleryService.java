@@ -47,9 +47,9 @@ public class TopItemsGalleryService {
 
         final TopItemsGalleryDto topItemsGallery = new TopItemsGalleryDto();
 
-        final Stream<UserTopItem> artists = topItems.stream().filter(artist -> artist.getType().equals("artist"));
+        final Stream<UserTopItem> artists = topItems.stream().filter(item -> item.getType().equals("artist"));
 
-        final Stream<UserTopItem> tracks = topItems.stream().filter(artist -> artist.getType().equals("track"));
+        final Stream<UserTopItem> tracks = topItems.stream().filter(item -> item.getType().equals("track"));
 
         final Map<String, TopItemsGalleryDto.Artist> spotifyIdToArtist = new HashMap<>();
 
