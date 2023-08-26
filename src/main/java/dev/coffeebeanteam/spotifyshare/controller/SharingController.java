@@ -71,11 +71,23 @@ public class SharingController {
                 .setUserAccountIdReceiver(accountId)
                 .setUserAccountIdRequester(loggedInUser.getId());
 
+        final UserAccountSharingKey userAccountSharingReverseKey = new UserAccountSharingKey()
+                .setUserAccountIdReceiver(loggedInUser.getId())
+                .setUserAccountIdRequester(accountId);
+
         final UserAccountSharing userAccountSharing = userAccountSharingRepository.findById(userAccountSharingKey)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account sharing not found"));
 
+        final UserAccountSharing userAccountSharingReverse =
+                userAccountSharingRepository.findById(userAccountSharingReverseKey)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account sharing not found"));
+
         if (userAccountSharing.getStatus() != SharingStatus.ACCEPTED) {
-            new ResponseStatusException(HttpStatus.FORBIDDEN, "User account sharing not accepted");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account sharing not accepted");
+        }
+
+        if (userAccountSharingReverse.getStatus() != SharingStatus.ACCEPTED) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account sharing not accepted");
         }
 
         final String sharerName = userAccountSharing.getRequestReceiver().getSpotifyUsername();
