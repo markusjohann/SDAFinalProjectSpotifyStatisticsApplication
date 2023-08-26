@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <style>
+        body, html {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background-color: #f9f9f9;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+        .container {
+          text-align: center;
+        }
+        .emoji {
+          font-size: calc(50vh);
+        }
+        .pop-animation {
+          animation: pop 1s ease-out;
+        }
+        @keyframes pop {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.2);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <span id="emojiElement" class="emoji">&#128165;</span>
+</div>
+<p>
+    Something went wrong. Try to <a href="/logout">login</a> and start over again.
+</p>
+<script>
+    window.onload = function() {
+      const emojiElement = document.getElementById('emojiElement');
+      emojiElement.classList.add('pop-animation');
+    };
+</script>
+</body>
+</html>
