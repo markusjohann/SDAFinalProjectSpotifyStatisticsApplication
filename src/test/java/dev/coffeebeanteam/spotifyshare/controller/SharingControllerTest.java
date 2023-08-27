@@ -429,6 +429,12 @@ public class SharingControllerTest extends BaseControllerTest {
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
                 .andExpect(result -> assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) result.getResolvedException()).getStatusCode()));
     }
+    
+    @Test
+    public void testCancelSharingWithNoAuthenticatedUser() throws Exception {
+        mockMvc.perform(get("/sharing/cancel?accountId=2"))
+                .andExpect(status().is(302));
+    }
 
     @Test
     public void testCancelSharingWithValidUserAndAccountId() throws Exception {
@@ -467,12 +473,4 @@ public class SharingControllerTest extends BaseControllerTest {
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
                 .andExpect(result -> assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) result.getResolvedException()).getStatusCode()));
     }
-
-    @Test
-    public void testCancelSharingWithNoAuthenticatedUser() throws Exception {
-        mockMvc.perform(get("/sharing/cancel?accountId=2"))
-                .andExpect(status().is(302));
-    }
-
-
 }
