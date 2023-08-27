@@ -231,5 +231,4 @@ public class SharingController {
 
         return "redirect:/dashboard";
     }
-
 }
