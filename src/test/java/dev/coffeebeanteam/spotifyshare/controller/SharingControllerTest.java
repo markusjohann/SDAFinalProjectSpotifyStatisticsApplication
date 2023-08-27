@@ -280,4 +280,66 @@ public class SharingControllerTest extends BaseControllerTest {
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
                 .andExpect(result -> assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) result.getResolvedException()).getStatusCode()));
     }
+
+    @Test
+    public void testAcceptRequestViewWithNoAuthenticatedUser() throws Exception {
+        mockMvc.perform(get("/sharing/request/accept-view?accountId=2"))
+                .andExpect(status().is(302));
+    }
+
+    @Test
+    public void testAcceptRequestViewWithValidUserAndAccountId() throws Exception {
+        UserAccount loggedInUser = new UserAccount()
+                .setId(1L);
+        UserAccountDto toAcceptUser = new UserAccountDto()
+                .setUserId(2L)
+                .setDisplayName("John");
+
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(
+                "client1",
+                "test-principal-name"
+        );
+        OAuth2AuthenticationToken authentication = getOauth2AuthenticationToken(authorizedClient);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+
+        when(userAccountService.getLoggedInUserAccount()).thenReturn(loggedInUser);
+        when(sharingService.getListOfToAcceptRequests(loggedInUser)).thenReturn(Collections.singletonList(toAcceptUser));
+
+        mockMvc.perform(get("/sharing/request/accept-view?accountId=2")
+                        .with(securityContext(securityContext)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("default-page"))
+                .andExpect(model().attribute("pageTitle", "Accept or Reject a Sharing Request"))
+                .andExpect(model().attribute("contentTitle", "Accept or Reject a Sharing Request"))
+                .andExpect(model().attribute("acceptShareRequestUserAccountDto", toAcceptUser));
+    }
+
+    @Test
+    public void testAcceptRequestViewWithInvalidAccountId() throws Exception {
+        UserAccount loggedInUser = new UserAccount().setId(1L);
+
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient(
+                "client1",
+                "test-principal-name"
+        );
+        OAuth2AuthenticationToken authentication = getOauth2AuthenticationToken(authorizedClient);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+
+        when(userAccountService.getLoggedInUserAccount()).thenReturn(loggedInUser);
+        when(sharingService.getListOfToAcceptRequests(loggedInUser)).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/sharing/request/accept-view?accountId=2")
+                        .with(securityContext(securityContext)))
+                .andExpect(
+                        result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException)
+                )
+                .andExpect(
+                        result -> assertEquals(
+                                HttpStatus.NOT_FOUND,
+                                ((ResponseStatusException) result.getResolvedException()).getStatusCode()
+                        )
+                );
+    }
 }
