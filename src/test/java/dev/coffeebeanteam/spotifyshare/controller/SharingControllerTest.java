@@ -1,5 +1,7 @@
 package dev.coffeebeanteam.spotifyshare.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import dev.coffeebeanteam.spotifyshare.dto.ui.UserAccountDto;
 import dev.coffeebeanteam.spotifyshare.model.UserAccount;
 import dev.coffeebeanteam.spotifyshare.model.UserAccountSharing;
 import dev.coffeebeanteam.spotifyshare.repository.UserAccountRepository;
@@ -7,6 +9,7 @@ import dev.coffeebeanteam.spotifyshare.service.SharingService;
 import dev.coffeebeanteam.spotifyshare.service.UserAccountService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,6 +29,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.securityContext;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @SpringBootTest(properties = {"spotify.api.client.id=testClientId", "spotify.api.client.secret=testClientSecret"})
 @ActiveProfiles("test")
@@ -39,6 +48,9 @@ public class SharingControllerTest extends BaseControllerTest {
 
     @MockBean
     protected SharingService sharingService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     public void sharingControllerTestSetup() {
@@ -119,5 +131,108 @@ public class SharingControllerTest extends BaseControllerTest {
                         HttpStatus.NOT_FOUND,
                         ((ResponseStatusException) result.getResolvedException()).getStatusCode())
                 );
+    }
+
+    @Test
+    public void testSharingRequestViewWithNoLoggedInUser() throws Exception {
+        mockMvc.perform(get("/sharing/request"))
+                .andExpect(status().is(302)); // assuming it redirects to the login page
+    }
+
+    @Test
+    public void testSharingRequestViewWithLoggedInUser() throws Exception {
+        UserAccount loggedInUser = new UserAccount()
+                .setId(1L)
+                .setSpotifyUsername("testUser");
+
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService
+                .loadAuthorizedClient("client1", "test-principal-name");
+        OAuth2AuthenticationToken authentication = getOauth2AuthenticationToken(authorizedClient);
+
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+
+        when(userAccountService.getLoggedInUserAccount()).thenReturn(loggedInUser);
+
+        mockMvc.perform(get("/sharing/request")
+                        .with(securityContext(securityContext)))
+                .andExpect(status().isOk())
+                .andExpect(view().name("default-page"))
+                .andExpect(model().attribute("pageTitle", "Make a Sharing Request"))
+                .andExpect(model().attribute("contentTitle", "Make a Sharing Request"))
+                .andExpect(model().attribute("showSharingRequestForm", true));
+
+        verify(navBarService, times(1)).populateViewModelWithNavBarItems(any());
+        verify(userAccountDetailsService, times(1)).populateViewModelWithUserDetails(any());
+    }
+
+    @Test
+    public void testUserSearchWithNoLoggedInUser() throws Exception {
+        mockMvc.perform(get("/sharing/request/user-search")
+                        .param("search", "test"))
+                .andExpect(status().is(302));
+    }
+
+    @Test
+    public void testUserSearchWithLoggedInUserAndResults() throws Exception {
+        OAuth2AuthenticationToken authentication = getOauth2AuthenticationToken(
+                authorizedClientService
+                        .loadAuthorizedClient("client1", "test-principal-name")
+        );
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+
+        List<UserAccountDto> results = Arrays.asList(
+                (new UserAccountDto()).setUserId(1L).setDisplayName("testUser1"),
+                (new UserAccountDto()).setUserId(2L).setDisplayName("testUser2")
+        );
+
+        when(userAccountService.searchUsersByDisplayName("test")).thenReturn(results);
+
+        MvcResult mvcResult = mockMvc.perform(get("/sharing/request/user-search")
+                        .with(securityContext(securityContext))
+                        .param("search", "test")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        List<UserAccountDto> actualResults = objectMapper.readValue(
+                contentAsString,
+                new TypeReference<>(){}
+        );
+
+        assertEquals(
+                objectMapper.writeValueAsString(results),
+                objectMapper.writeValueAsString(actualResults)
+        );
+    }
+
+    @Test
+    public void testUserSearchWithLoggedInUserAndNoResults() throws Exception {
+        OAuth2AuthenticationToken authentication = getOauth2AuthenticationToken(
+                authorizedClientService
+                        .loadAuthorizedClient("client1", "test-principal-name")
+        );
+
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+
+        when(userAccountService.searchUsersByDisplayName("test")).thenReturn(Collections.emptyList());
+
+        MvcResult mvcResult = mockMvc.perform(get("/sharing/request/user-search")
+                        .with(securityContext(securityContext))
+                        .param("search", "test")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        List<UserAccountDto> actualResults = objectMapper.readValue(
+                contentAsString,
+                new TypeReference<>(){}
+        );
+
+        assertTrue(actualResults.isEmpty());
     }
 }
