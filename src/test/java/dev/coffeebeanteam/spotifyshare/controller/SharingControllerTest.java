@@ -27,7 +27,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.securityContext;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -430,4 +429,50 @@ public class SharingControllerTest extends BaseControllerTest {
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
                 .andExpect(result -> assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) result.getResolvedException()).getStatusCode()));
     }
+
+    @Test
+    public void testCancelSharingWithValidUserAndAccountId() throws Exception {
+        UserAccount loggedInUser = new UserAccount().setId(1L);
+        UserAccount toCancel = new UserAccount().setId(2L);
+
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient("client1", "test-principal-name");
+        OAuth2AuthenticationToken authentication = getOauth2AuthenticationToken(authorizedClient);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+
+        when(userAccountService.getLoggedInUserAccount()).thenReturn(loggedInUser);
+        when(userAccountRepository.findById(anyLong())).thenReturn(Optional.of(toCancel));
+
+        mockMvc.perform(get("/sharing/cancel?accountId=2")
+                        .with(securityContext(securityContext))
+                        .flashAttr("successMessage", "Sharing successfully canceled!"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/dashboard"));
+    }
+
+    @Test
+    public void testCancelSharingWithInvalidAccountId() throws Exception {
+        UserAccount loggedInUser = new UserAccount().setId(1L);
+
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient("client1", "test-principal-name");
+        OAuth2AuthenticationToken authentication = getOauth2AuthenticationToken(authorizedClient);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+
+        when(userAccountService.getLoggedInUserAccount()).thenReturn(loggedInUser);
+        when(userAccountRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/sharing/cancel?accountId=2")
+                        .with(securityContext(securityContext)))
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
+                .andExpect(result -> assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) result.getResolvedException()).getStatusCode()));
+    }
+
+    @Test
+    public void testCancelSharingWithNoAuthenticatedUser() throws Exception {
+        mockMvc.perform(get("/sharing/cancel?accountId=2"))
+                .andExpect(status().is(302));
+    }
+
+
 }
