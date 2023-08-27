@@ -27,10 +27,6 @@ import static org.mockito.Mockito.*;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
-import java.time.Instant;
-import java.util.Collections;
-
-
 @SpringBootTest(properties = {"spotify.api.client.id=testClientId", "spotify.api.client.secret=testClientSecret"})
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
