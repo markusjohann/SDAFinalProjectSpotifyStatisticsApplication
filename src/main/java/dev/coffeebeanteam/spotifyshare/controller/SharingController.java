@@ -67,45 +67,34 @@ public class SharingController {
 
         final UserAccount loggedInUser = userAccountService.getLoggedInUserAccount();
 
-        final UserAccountSharingKey userAccountSharingKey = new UserAccountSharingKey()
-                .setUserAccountIdReceiver(accountId)
-                .setUserAccountIdRequester(loggedInUser.getId());
+        final UserAccount sharingUserAccount = userAccountRepository.findById(accountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account not found"));
 
-        final UserAccountSharingKey userAccountSharingReverseKey = new UserAccountSharingKey()
-                .setUserAccountIdReceiver(loggedInUser.getId())
-                .setUserAccountIdRequester(accountId);
+        sharingService.getUserSharing(loggedInUser, sharingUserAccount)
+                .ifPresentOrElse(
+                        (sharing) -> {
+                            final String sharerName = sharingUserAccount.getSpotifyUsername();
 
-        final UserAccountSharing userAccountSharing = userAccountSharingRepository.findById(userAccountSharingKey)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account sharing not found"));
+                            model
+                                    .addAttribute("pageTitle", "Top Artists and Tracks of " + sharerName)
+                                    .addAttribute("contentTitle", "Top Artists and Tracks of " + sharerName)
+                                    .addAttribute("sharerName", sharerName)
+                                    .addAttribute("sharerUserId", sharingUserAccount.getId());
 
-        final UserAccountSharing userAccountSharingReverse =
-                userAccountSharingRepository.findById(userAccountSharingReverseKey)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account sharing not found"));
+                            navBarService.populateViewModelWithNavBarItems(model);
 
-        if (userAccountSharing.getStatus() != SharingStatus.ACCEPTED) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account sharing not accepted");
-        }
+                            userAccountDetailsService.setAuthorizedClient(authorizedClient).populateViewModelWithUserDetails(model);
 
-        if (userAccountSharingReverse.getStatus() != SharingStatus.ACCEPTED) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User account sharing not accepted");
-        }
+                            topItemsGalleryService.setAuthorizedClient(authorizedClient).populateModelViewWithTopItems(
+                                    model,
+                                    sharingUserAccount
+                            );
 
-        final String sharerName = userAccountSharing.getRequestReceiver().getSpotifyUsername();
-
-        model
-                .addAttribute("pageTitle", "Top Artists and Tracks of " + sharerName)
-                .addAttribute("contentTitle", "Top Artists and Tracks of " + sharerName)
-                .addAttribute("sharerName", sharerName)
-                .addAttribute("sharerUserId", userAccountSharing.getRequestReceiver().getId());
-
-        navBarService.populateViewModelWithNavBarItems(model);
-
-        userAccountDetailsService.setAuthorizedClient(authorizedClient).populateViewModelWithUserDetails(model);
-
-        topItemsGalleryService.setAuthorizedClient(authorizedClient).populateModelViewWithTopItems(
-                model,
-                userAccountSharing.getRequestReceiver()
-        );
+                        },
+                        () -> {
+                            new ResponseStatusException(HttpStatus.NOT_FOUND, "Sharing between user accounts not found");
+                        }
+                );
 
         return "default-page";
     }
@@ -223,9 +212,11 @@ public class SharingController {
     }
 
     @GetMapping("/cancel")
-    public String cancelSharing( @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
-                                 @RequestParam Long accountId,
-                                 RedirectAttributes redirectAttributes){
+    public String cancelSharing(
+            @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
+            @RequestParam Long accountId,
+            RedirectAttributes redirectAttributes
+    ) {
 
         userAccountService.setAuthorizedClient(authorizedClient);
 
@@ -234,16 +225,7 @@ public class SharingController {
         final UserAccount toCancel = userAccountRepository.findById(accountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User account not found"));
 
-        final UserAccountSharingKey requesterKey = new UserAccountSharingKey()
-                .setUserAccountIdRequester(loggedInUser.getId())
-                .setUserAccountIdReceiver(toCancel.getId());
-
-        final UserAccountSharingKey receiverKey = new UserAccountSharingKey()
-                .setUserAccountIdRequester(toCancel.getId())
-                .setUserAccountIdReceiver(loggedInUser.getId());
-
-        userAccountSharingRepository.deleteById(requesterKey);
-        userAccountSharingRepository.deleteById(receiverKey);
+        sharingService.cancelUserSharing(loggedInUser, toCancel);
 
         redirectAttributes.addFlashAttribute("successMessage", "Sharing successfully canceled!");
 

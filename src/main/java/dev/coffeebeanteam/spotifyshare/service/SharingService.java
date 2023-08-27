@@ -6,9 +6,12 @@ import dev.coffeebeanteam.spotifyshare.model.UserAccount;
 import dev.coffeebeanteam.spotifyshare.model.UserAccountSharing;
 import dev.coffeebeanteam.spotifyshare.model.UserAccountSharingKey;
 import dev.coffeebeanteam.spotifyshare.repository.UserAccountSharingRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -113,5 +116,51 @@ public class SharingService {
                         .setDisplayName(request.getRequestReceiver().getSpotifyUsername()))
                 .collect(Collectors.toList());
 
+    }
+
+    public Optional<UserAccountSharing> getUserSharing(UserAccount userOne, UserAccount userTwo) {
+        Long userAccountOneId = userOne.getId();
+        Long userAccountTwoId = userTwo.getId();
+
+        final UserAccountSharingKey userAccountSharingKey = new UserAccountSharingKey()
+                .setUserAccountIdReceiver(userAccountOneId)
+                .setUserAccountIdRequester(userAccountTwoId);
+
+        final UserAccountSharingKey userAccountSharingReverseKey = new UserAccountSharingKey()
+                .setUserAccountIdReceiver(userAccountTwoId)
+                .setUserAccountIdRequester(userAccountOneId);
+
+        Optional<UserAccountSharing> userAccountSharingOpt = userAccountSharingRepository.findById(userAccountSharingKey);
+        Optional<UserAccountSharing> userAccountSharingReverseOpt = userAccountSharingRepository.findById(userAccountSharingReverseKey);
+
+        if (userAccountSharingOpt.isPresent() && userAccountSharingReverseOpt.isPresent()) {
+            UserAccountSharing userAccountSharing = userAccountSharingOpt.get();
+            UserAccountSharing userAccountSharingReverse = userAccountSharingReverseOpt.get();
+
+            if (userAccountSharing.getStatus() == SharingStatus.ACCEPTED &&
+                    userAccountSharingReverse.getStatus() == SharingStatus.ACCEPTED) {
+                return userAccountSharingOpt;
+            }
+        }
+
+        return Optional.empty();
+    }
+    public SharingService cancelUserSharing(UserAccount userOne, UserAccount userTwo)
+    {
+        Long userAccountOneId = userOne.getId();
+        Long userAccountTwoId = userTwo.getId();
+
+        final UserAccountSharingKey userAccountSharingKey = new UserAccountSharingKey()
+                .setUserAccountIdReceiver(userAccountOneId)
+                .setUserAccountIdRequester(userAccountTwoId);
+
+        final UserAccountSharingKey userAccountSharingReverseKey = new UserAccountSharingKey()
+                .setUserAccountIdReceiver(userAccountTwoId)
+                .setUserAccountIdRequester(userAccountOneId);
+
+        userAccountSharingRepository.deleteById(userAccountSharingKey);
+        userAccountSharingRepository.deleteById(userAccountSharingReverseKey);
+
+        return this;
     }
 }
