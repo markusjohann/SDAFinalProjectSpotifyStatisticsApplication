@@ -6,9 +6,7 @@ import dev.coffeebeanteam.spotifyshare.model.UserAccount;
 import dev.coffeebeanteam.spotifyshare.model.UserAccountSharing;
 import dev.coffeebeanteam.spotifyshare.model.UserAccountSharingKey;
 import dev.coffeebeanteam.spotifyshare.repository.UserAccountSharingRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
