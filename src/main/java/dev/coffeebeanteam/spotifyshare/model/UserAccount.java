@@ -25,10 +25,7 @@ public class UserAccount {
     @Column(unique = true)
     private String spotifyEmail;
 
-    @OneToMany(mappedBy = "userAccountOne")
-    private Set<UserAccountPairing> requestAcceptedOne;
-    @OneToMany(mappedBy = "userAccountTwo")
-    private Set<UserAccountPairing> requestAcceptedTwo;
+    private boolean approved = true;
 
-
+    private boolean approvalEmailSent = false;
 }

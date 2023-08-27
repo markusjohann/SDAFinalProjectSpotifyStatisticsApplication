@@ -2,16 +2,16 @@
     th:fragment="navItem (navItem : dev.coffeebeanteam.spotifyshare.dto.ui.navbar.CollapsibleNavItem)"
 */-->
 <li class="nav-item" th:fragment="collapsibleNavItem(item)">
-    <a class="nav-link collapsed" href="#" data-toggle="collapse" th:data-target="${'#' + item.getCollapseElementId()}"
-       aria-expanded="true" aria-controls="collapseTwo">
-        <i th:lass="${item.getIconCss()}"></i>
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" th:data-target="${'#' + item.getCollapseElementId()}">
+        <i th:class="${item.getIconCss()}"></i>
         <span th:text="${item.getTitle()}"></span>
     </a>
-    <div th:id="${item.getCollapseElementId()}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+    <div th:id="${item.getCollapseElementId()}" class="collapse" data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header" th:text="${item.getSubTitle()}"></h6>
             <th:block th:each="subItem : ${item.getNavItems()}">
-                <a class="collapse-item" th:href="${subItem.getLink()}" th:text="${subItem.getTitle()}"></a>
+                <a th:if="${!subItem.getLink().equals('')}" class="collapse-item" th:href="${subItem.getLink()}" th:text="${subItem.getTitle()}"></a>
+                <span th:if="${subItem.getLink().equals('')}" class="collapse-item" th:text="${subItem.getTitle()}"></span>
             </th:block>
         </div>
     </div>

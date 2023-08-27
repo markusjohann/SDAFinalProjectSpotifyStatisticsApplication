@@ -1,38 +1,54 @@
 package dev.coffeebeanteam.spotifyshare.controller;
 
-import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.CollapsibleNavItem;
-import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.Divider;
-import dev.coffeebeanteam.spotifyshare.dto.ui.navbar.NavItem;
+import dev.coffeebeanteam.spotifyshare.service.UserAccountService;
+import dev.coffeebeanteam.spotifyshare.service.ui.NavBarService;
+import dev.coffeebeanteam.spotifyshare.service.ui.TopItemsGalleryService;
+import dev.coffeebeanteam.spotifyshare.service.ui.UserAccountDetailsService;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/dashboard")
 public class DashboardController {
+    private NavBarService navBarService;
+    private UserAccountDetailsService userAccountDetailsService;
+    private TopItemsGalleryService topItemsGalleryService;
+
+    private UserAccountService userAccountService;
+
+    public DashboardController(
+            NavBarService navBarService,
+            UserAccountDetailsService userAccountDetailsService,
+            TopItemsGalleryService topItemsGalleryService,
+            UserAccountService userAccountService
+    ) {
+        this.navBarService = navBarService;
+        this.userAccountDetailsService = userAccountDetailsService;
+        this.topItemsGalleryService = topItemsGalleryService;
+        this.userAccountService = userAccountService;
+    }
+
     @GetMapping
-    public String index(Model model) {
-        final ArrayList<Object> navBarItems = new ArrayList() {{
-                add(new Divider());
-                add(new NavItem()
-                        .setTitle("Dashboard")
-                        .setIconCss("fas fa-fw fa-tachometer-alt")
-                );
-                add(new CollapsibleNavItem()
-                        .setTitle("Sharing")
-                        .setSubTitle("Your Shares")
-                        .setIconCss("")
-                        .addNavItem("Top Artists and Tracks of Others", "#", "")
-                        .addNavItem("Request Shares", "#", "")
-                );
-        }};
+    public String index(
+            @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient authorizedClient,
+            Model model
+    ) {
+        model
+                .addAttribute("pageTitle", "Dashboard")
+                .addAttribute("contentTitle", "Dashboard");
 
-        model.addAttribute("pageTitle", "Dashboard");
+        userAccountService.setAuthorizedClient(authorizedClient);
 
-        model.addAttribute("navBarItems", navBarItems);
+        navBarService.populateViewModelWithNavBarItems(model);
 
-        return "dashboard";
+        userAccountDetailsService.setAuthorizedClient(authorizedClient).populateViewModelWithUserDetails(model);
+
+        topItemsGalleryService.setAuthorizedClient(authorizedClient).populateModelViewWithTopItems(model);
+
+        return "default-page";
     }
 }

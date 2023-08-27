@@ -1,8 +1,9 @@
 package dev.coffeebeanteam.spotifyshare.dto;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
-@Data
+@Data @Accessors(chain = true)
 public class ImageDto {
     private String url;
     private int height;

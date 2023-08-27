@@ -1,0 +1,20 @@
+<div class="row" th:fragment="acceptOrRejectSharingRequest (shareRequestUserAccountDto)">
+    <div class="col-lg-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6
+                        th:text="${shareRequestUserAccountDto.getDisplayName()}"
+                        class="m-0 font-weight-bold text-primary"
+                />
+            </div>
+            <div class="card-body">
+                <a th:href="${'/sharing/request/accept?accountId=' + shareRequestUserAccountDto.getUserId()}" class="btn btn-success btn-circle">
+                    <i class="fas fa-check"></i>
+                </a>
+                <a th:href="${'/sharing/request/reject?accountId=' + shareRequestUserAccountDto.getUserId()}" class="btn btn-danger btn-circle">
+                    <i class="fas fa-trash"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
