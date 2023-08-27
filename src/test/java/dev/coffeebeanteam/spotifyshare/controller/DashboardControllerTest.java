@@ -41,81 +41,7 @@ import java.util.Collections;
 @SpringBootTest(properties = {"spotify.api.client.id=testClientId", "spotify.api.client.secret=testClientSecret"})
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class DashboardControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private NavBarService navBarService;
-
-    @MockBean
-    private UserAccountDetailsService userAccountDetailsService;
-
-    @MockBean
-    private TopItemsGalleryService topItemsGalleryService;
-
-    @MockBean
-    private OAuth2AuthorizedClientService authorizedClientService;
-
-    @MockBean
-    private SpotifyApiService spotifyApiService;
-
-    @BeforeEach
-    public void setup() {
-        ClientRegistration clientRegistration = ClientRegistration.withRegistrationId("client1")
-                .clientId("test-client-id")
-                .clientSecret("test-client-secret")
-                .tokenUri("http://localhost:8080/auth/token")
-                .authorizationUri("http://localhost:8080/auth/authorize")
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri("http://localhost:8080/redirect")
-                .scope("read")
-                .build();
-
-        OAuth2AccessToken accessToken = new OAuth2AccessToken(
-                OAuth2AccessToken.TokenType.BEARER,
-                "fake-access-token",
-                Instant.now(),
-                Instant.now().plusSeconds(3600),
-                Collections.singleton("read")
-        );
-
-        OAuth2AuthorizedClient authorizedClient = new OAuth2AuthorizedClient(
-                clientRegistration,
-                "test-principal-name",
-                accessToken
-        );
-
-        Mockito.when(authorizedClientService.loadAuthorizedClient(
-                anyString(),
-                anyString()
-        )).thenReturn(authorizedClient);
-
-        UserDto mockUserDto = new UserDto();
-        TopItemsGalleryDto mockTopItemsGalleryDto = new TopItemsGalleryDto();
-
-        when(spotifyApiService.setAuthorizedClient(any())).thenReturn(spotifyApiService);
-        when(spotifyApiService.getUser()).thenReturn(mockUserDto);
-
-        when(topItemsGalleryService.setAuthorizedClient(any())).thenReturn(topItemsGalleryService);
-        when(topItemsGalleryService.getUserTopItemsGalleryDto(any())).thenReturn(mockTopItemsGalleryDto);
-    }
-
-    private OAuth2AuthenticationToken getOauth2AuthenticationToken(OAuth2AuthorizedClient authorizedClient) {
-        OAuth2User principal = new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-                Collections.singletonMap("name", "testName"),
-                "name"
-        );
-
-        return new OAuth2AuthenticationToken(
-                principal,
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-                authorizedClient.getClientRegistration().getRegistrationId()
-        );
-    }
-
+public class DashboardControllerTest extends BaseControllerTest {
     @Test
     public void testIndexWithNoLoggedInUser() throws Exception {
         mockMvc.perform(get("/dashboard"))
@@ -143,4 +69,5 @@ public class DashboardControllerTest {
         verify(navBarService, times(1)).populateViewModelWithNavBarItems(any());
         verify(userAccountDetailsService, times(1)).populateViewModelWithUserDetails(any());
         verify(topItemsGalleryService, times(1)).populateModelViewWithTopItems(any());
-    }}
+    }
+}
