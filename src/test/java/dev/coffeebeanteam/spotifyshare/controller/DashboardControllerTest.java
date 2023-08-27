@@ -55,7 +55,6 @@ public class DashboardControllerTest {
     @MockBean
     private TopItemsGalleryService topItemsGalleryService;
 
-
     @MockBean
     private OAuth2AuthorizedClientService authorizedClientService;
 
