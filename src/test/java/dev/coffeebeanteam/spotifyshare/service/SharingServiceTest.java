@@ -180,6 +180,23 @@ class SharingServiceTest {
     }
 
     @Test
+    void getUserSharing_ShouldReturnCorrectSharingWhenBothSidesAccepted() {
+        UserAccount userOne = new UserAccount().setId(1L);
+        UserAccount userTwo = new UserAccount().setId(2L);
+
+        UserAccountSharing sharing = new UserAccountSharing().setStatus(SharingStatus.ACCEPTED);
+        UserAccountSharing reverseSharing = new UserAccountSharing().setStatus(SharingStatus.ACCEPTED);
+
+        when(userAccountSharingRepository.findById(any()))
+                .thenReturn(Optional.of(sharing), Optional.of(reverseSharing));
+
+        Optional<UserAccountSharing> result = sharingService.getUserSharing(userOne, userTwo);
+
+        assertTrue(result.isPresent());
+        assertEquals(SharingStatus.ACCEPTED, result.get().getStatus());
+    }
+
+    @Test
     void getUserSharing_ShouldReturnEmptyWhenEitherSideNotAccepted() {
         UserAccount userOne = new UserAccount().setId(1L);
         UserAccount userTwo = new UserAccount().setId(2L);
@@ -204,5 +221,6 @@ class SharingServiceTest {
 
         verify(userAccountSharingRepository, times(2)).deleteById(any());
     }
+
 }
 
