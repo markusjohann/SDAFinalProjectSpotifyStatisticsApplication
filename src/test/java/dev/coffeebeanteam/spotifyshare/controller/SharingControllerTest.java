@@ -342,4 +342,48 @@ public class SharingControllerTest extends BaseControllerTest {
                         )
                 );
     }
+
+    @Test
+    public void testAcceptRequestWithNoAuthenticatedUser() throws Exception {
+        mockMvc.perform(get("/sharing/request/accept?accountId=2"))
+                .andExpect(status().is(302));
+    }
+
+    @Test
+    public void testAcceptRequestWithValidUserAndAccountId() throws Exception {
+        UserAccount loggedInUser = new UserAccount().setId(1L);
+        UserAccount toAccept = new UserAccount().setId(2L);
+
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient("client1", "test-principal-name");
+        OAuth2AuthenticationToken authentication = getOauth2AuthenticationToken(authorizedClient);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+
+        when(userAccountService.getLoggedInUserAccount()).thenReturn(loggedInUser);
+        when(userAccountRepository.findById(anyLong())).thenReturn(Optional.of(toAccept));
+
+        mockMvc.perform(get("/sharing/request/accept?accountId=2")
+                        .with(securityContext(securityContext))
+                        .flashAttr("successMessage", "Sharing request accepted!"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/dashboard"));
+    }
+
+    @Test
+    public void testAcceptRequestWithInvalidAccountId() throws Exception {
+        UserAccount loggedInUser = new UserAccount().setId(1L);
+
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient("client1", "test-principal-name");
+        OAuth2AuthenticationToken authentication = getOauth2AuthenticationToken(authorizedClient);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+
+        when(userAccountService.getLoggedInUserAccount()).thenReturn(loggedInUser);
+        when(userAccountRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/sharing/request/accept?accountId=2")
+                        .with(securityContext(securityContext)))
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
+                .andExpect(result -> assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) result.getResolvedException()).getStatusCode()));
+    }
 }
