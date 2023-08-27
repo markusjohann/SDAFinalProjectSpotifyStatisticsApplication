@@ -25,10 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.securityContext;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -234,5 +233,51 @@ public class SharingControllerTest extends BaseControllerTest {
         );
 
         assertTrue(actualResults.isEmpty());
+    }
+
+    @Test
+    public void testMakeRequestWithNoAuthenticatedUser() throws Exception {
+        mockMvc.perform(get("/sharing/request/make?receiverId=2"))
+                .andExpect(status().is(302));
+    }
+
+    @Test
+    public void testMakeRequestWithValidUser() throws Exception {
+        UserAccount loggedInUser = new UserAccount().setId(1L);
+        UserAccount requestReceiver = new UserAccount().setId(2L);
+
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient("client1", "test-principal-name");
+        OAuth2AuthenticationToken authentication = getOauth2AuthenticationToken(authorizedClient);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+
+        when(userAccountRepository.findById(2L)).thenReturn(Optional.of(requestReceiver));
+        when(userAccountService.getLoggedInUserAccount()).thenReturn(loggedInUser);
+
+        mockMvc.perform(get("/sharing/request/make?receiverId=2")
+                        .with(securityContext(securityContext)))
+                .andExpect(status().is(302))
+                .andExpect(redirectedUrl("/dashboard"))
+                .andExpect(flash().attribute("successMessage", "Sharing request made successfully!"));
+
+        verify(sharingService, times(1)).requestSharing(loggedInUser, requestReceiver);
+    }
+
+    @Test
+    public void testMakeRequestWithInvalidReceiverId() throws Exception {
+        UserAccount loggedInUser = new UserAccount().setId(1L);
+
+        OAuth2AuthorizedClient authorizedClient = authorizedClientService.loadAuthorizedClient("client1", "test-principal-name");
+        OAuth2AuthenticationToken authentication = getOauth2AuthenticationToken(authorizedClient);
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(authentication);
+
+        when(userAccountService.getLoggedInUserAccount()).thenReturn(loggedInUser);
+        when(userAccountRepository.findById(2L)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/sharing/request/make?receiverId=2")
+                        .with(securityContext(securityContext)))
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ResponseStatusException))
+                .andExpect(result -> assertEquals(HttpStatus.NOT_FOUND, ((ResponseStatusException) result.getResolvedException()).getStatusCode()));
     }
 }
