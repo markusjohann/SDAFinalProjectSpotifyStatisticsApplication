@@ -178,5 +178,31 @@ class SharingServiceTest {
 
         assertNotNull(sharingService.getListOfSharingUserAccounts(loggedInUser));
     }
+
+    @Test
+    void getUserSharing_ShouldReturnEmptyWhenEitherSideNotAccepted() {
+        UserAccount userOne = new UserAccount().setId(1L);
+        UserAccount userTwo = new UserAccount().setId(2L);
+
+        UserAccountSharing sharing = new UserAccountSharing().setStatus(SharingStatus.PENDING);
+        UserAccountSharing reverseSharing = new UserAccountSharing().setStatus(SharingStatus.ACCEPTED);
+
+        when(userAccountSharingRepository.findById(any()))
+                .thenReturn(Optional.of(sharing), Optional.of(reverseSharing));
+
+        Optional<UserAccountSharing> result = sharingService.getUserSharing(userOne, userTwo);
+
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    void cancelUserSharing_ShouldDeleteBothRequests() {
+        UserAccount userOne = new UserAccount().setId(1L);
+        UserAccount userTwo = new UserAccount().setId(2L);
+
+        sharingService.cancelUserSharing(userOne, userTwo);
+
+        verify(userAccountSharingRepository, times(2)).deleteById(any());
+    }
 }
 
