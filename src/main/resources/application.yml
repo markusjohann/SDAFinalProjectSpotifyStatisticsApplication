@@ -1,11 +1,11 @@
 spring:
   datasource:
-    url: jdbc:mariadb://localhost:3306/spotify_share
+    url: jdbc:mysql://localhost:3306/spotifyshare
     username: root
-    password:
-    driver-class-name: org.mariadb.jdbc.Driver
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    database-platform: org.hibernate.dialect.MariaDBDialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
     hibernate:
       ddl-auto: update
@@ -26,7 +26,7 @@ spring:
 #spring.datasource.username=root
 #spring.datasource.url=jdbc:mysql://localhost:3306/spotify-share
 #spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-
+#
 #spring.jpa.hibernate.ddl-auto=update
 #spring.jpa.show-sql=true
 #spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
